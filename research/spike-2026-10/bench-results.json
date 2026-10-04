@@ -1,0 +1,560 @@
+[
+  {
+    "data" : {
+      "beatClassesInSvg" : {
+        "beats" : 220,
+        "withClass" : 220
+      },
+      "click" : {
+        "builtInHitTestOk" : 110,
+        "missingBounds" : 0,
+        "nearestNoteHeadOk" : 220,
+        "notes" : 220
+      },
+      "cursor" : {
+        "ok" : 190,
+        "onsets" : 190
+      },
+      "patch" : {
+        "newIds" : 6,
+        "rendered" : 6
+      }
+    },
+    "name" : "g4-alphatab",
+    "test" : "test=ids&engine=alphatab"
+  },
+  {
+    "data" : {
+      "click" : {
+        "notes" : 220,
+        "ok" : 220
+      },
+      "cursor" : {
+        "misses" : [
+          "m0008e8@15500ms→[m0008e8g0,m0008e17n0]"
+        ],
+        "ok" : 189,
+        "onsets" : 190
+      },
+      "patch" : {
+        "newIds" : 6,
+        "rendered" : 6
+      }
+    },
+    "name" : "g4-verovio",
+    "test" : "test=ids&engine=verovio"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.29999999999999999,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 67,
+        "mean" : 52.399999999999999,
+        "n" : 11,
+        "p50" : 50,
+        "p95" : 67
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 84,
+      "measures" : 180,
+      "mode" : "full",
+      "modelBuildMs" : {
+        "max" : 3,
+        "mean" : 2.5,
+        "n" : 12,
+        "p50" : 2,
+        "p95" : 3
+      }
+    },
+    "name" : "bench-alphatab-full-180",
+    "test" : "test=bench&engine=alphatab&mode=full&n=180"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.29999999999999999,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.40000000000000002,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 116,
+        "mean" : 80,
+        "n" : 11,
+        "p50" : 70,
+        "p95" : 116
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 136,
+      "measures" : 500,
+      "mode" : "full",
+      "modelBuildMs" : {
+        "max" : 8,
+        "mean" : 6.9000000000000004,
+        "n" : 12,
+        "p50" : 7,
+        "p95" : 8
+      }
+    },
+    "name" : "bench-alphatab-full-500",
+    "test" : "test=bench&engine=alphatab&mode=full&n=500"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 2,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 2
+      },
+      "diffScoresMs" : {
+        "max" : 2,
+        "mean" : 0.80000000000000004,
+        "n" : 11,
+        "p50" : 1,
+        "p95" : 2
+      },
+      "editToPaintMs" : {
+        "max" : 283,
+        "mean" : 225.69999999999999,
+        "n" : 11,
+        "p50" : 233,
+        "p95" : 283
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 284,
+      "measures" : 2000,
+      "mode" : "full",
+      "modelBuildMs" : {
+        "max" : 57,
+        "mean" : 32.799999999999997,
+        "n" : 12,
+        "p50" : 29,
+        "p95" : 57
+      }
+    },
+    "name" : "bench-alphatab-full-2000",
+    "test" : "test=bench&engine=alphatab&mode=full&n=2000"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.20000000000000001,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 90,
+        "mean" : 38.100000000000001,
+        "n" : 11,
+        "p50" : 33,
+        "p95" : 90
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 67,
+      "measures" : 180,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 6,
+        "mean" : 3.3999999999999999,
+        "n" : 12,
+        "p50" : 3,
+        "p95" : 6
+      },
+      "systemRenderMs" : {
+        "max" : 4,
+        "mean" : 1,
+        "n" : 50,
+        "p50" : 1,
+        "p95" : 2
+      },
+      "systemRenders" : 51
+    },
+    "name" : "bench-alphatab-system-180",
+    "test" : "test=bench&engine=alphatab&mode=system&n=180"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.10000000000000001,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.20000000000000001,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 34,
+        "mean" : 32.5,
+        "n" : 11,
+        "p50" : 33,
+        "p95" : 34
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 83,
+      "measures" : 500,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 16,
+        "mean" : 9.5,
+        "n" : 12,
+        "p50" : 9,
+        "p95" : 16
+      },
+      "systemRenderMs" : {
+        "max" : 4,
+        "mean" : 0.90000000000000002,
+        "n" : 50,
+        "p50" : 1,
+        "p95" : 2
+      },
+      "systemRenders" : 51
+    },
+    "name" : "bench-alphatab-system-500",
+    "test" : "test=bench&engine=alphatab&mode=system&n=500"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 1,
+        "p95" : 1
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 67,
+        "mean" : 44.200000000000003,
+        "n" : 11,
+        "p50" : 48,
+        "p95" : 67
+      },
+      "engine" : "alphatab",
+      "initToFirstPaintMs" : 100,
+      "measures" : 2000,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 32,
+        "mean" : 24.5,
+        "n" : 12,
+        "p50" : 21,
+        "p95" : 32
+      },
+      "systemRenderMs" : {
+        "max" : 4,
+        "mean" : 1,
+        "n" : 51,
+        "p50" : 1,
+        "p95" : 2
+      },
+      "systemRenders" : 52
+    },
+    "name" : "bench-alphatab-system-2000",
+    "test" : "test=bench&engine=alphatab&mode=system&n=2000"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.59999999999999998,
+        "n" : 11,
+        "p50" : 1,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 284,
+        "mean" : 271.60000000000002,
+        "n" : 11,
+        "p50" : 268,
+        "p95" : 284
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 333,
+      "loadDataMs" : {
+        "max" : 176,
+        "mean" : 163.59999999999999,
+        "n" : 12,
+        "p50" : 163,
+        "p95" : 176
+      },
+      "measures" : 180,
+      "mode" : "full",
+      "pages" : 4
+    },
+    "name" : "bench-verovio-full-180",
+    "test" : "test=bench&engine=verovio&mode=full&n=180"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.40000000000000002,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "diffScoresMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "editToPaintMs" : {
+        "max" : 583,
+        "mean" : 559.39999999999998,
+        "n" : 11,
+        "p50" : 550,
+        "p95" : 583
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 678,
+      "loadDataMs" : {
+        "max" : 468,
+        "mean" : 447.39999999999998,
+        "n" : 12,
+        "p50" : 446,
+        "p95" : 468
+      },
+      "measures" : 500,
+      "mode" : "full",
+      "pages" : 10
+    },
+    "name" : "bench-verovio-full-500",
+    "test" : "test=bench&engine=verovio&mode=full&n=500"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.59999999999999998,
+        "n" : 11,
+        "p50" : 1,
+        "p95" : 1
+      },
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 2333,
+        "mean" : 2237.8000000000002,
+        "n" : 11,
+        "p50" : 2234,
+        "p95" : 2333
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 2333,
+      "loadDataMs" : {
+        "max" : 2247,
+        "mean" : 2135.5,
+        "n" : 12,
+        "p50" : 2121,
+        "p95" : 2247
+      },
+      "measures" : 2000,
+      "mode" : "full",
+      "pages" : 39
+    },
+    "name" : "bench-verovio-full-2000",
+    "test" : "test=bench&engine=verovio&mode=full&n=2000"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.29999999999999999,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "editToPaintMs" : {
+        "max" : 84,
+        "mean" : 77.200000000000003,
+        "n" : 11,
+        "p50" : 83,
+        "p95" : 84
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 317,
+      "measures" : 180,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 12,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "systemRenderMs" : {
+        "max" : 24,
+        "mean" : 14.699999999999999,
+        "n" : 52,
+        "p50" : 14,
+        "p95" : 18
+      },
+      "systemRenders" : 53
+    },
+    "name" : "bench-verovio-system-180",
+    "test" : "test=bench&engine=verovio&mode=system&n=180"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.10000000000000001,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.20000000000000001,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 84,
+        "mean" : 72.700000000000003,
+        "n" : 11,
+        "p50" : 67,
+        "p95" : 84
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 283,
+      "measures" : 500,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 1,
+        "mean" : 0.10000000000000001,
+        "n" : 12,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "systemRenderMs" : {
+        "max" : 23,
+        "mean" : 14.5,
+        "n" : 52,
+        "p50" : 14,
+        "p95" : 18
+      },
+      "systemRenders" : 53
+    },
+    "name" : "bench-verovio-system-500",
+    "test" : "test=bench&engine=verovio&mode=system&n=500"
+  },
+  {
+    "data" : {
+      "applyPatchMs" : {
+        "max" : 1,
+        "mean" : 0.40000000000000002,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "cacheHits" : 0,
+      "diffScoresMs" : {
+        "max" : 1,
+        "mean" : 0.5,
+        "n" : 11,
+        "p50" : 0,
+        "p95" : 1
+      },
+      "editToPaintMs" : {
+        "max" : 84,
+        "mean" : 75.799999999999997,
+        "n" : 11,
+        "p50" : 83,
+        "p95" : 84
+      },
+      "engine" : "verovio",
+      "initToFirstPaintMs" : 266,
+      "measures" : 2000,
+      "mode" : "system",
+      "prepareMs" : {
+        "max" : 0,
+        "mean" : 0,
+        "n" : 12,
+        "p50" : 0,
+        "p95" : 0
+      },
+      "systemRenderMs" : {
+        "max" : 23,
+        "mean" : 15.1,
+        "n" : 52,
+        "p50" : 15,
+        "p95" : 18
+      },
+      "systemRenders" : 53
+    },
+    "name" : "bench-verovio-system-2000",
+    "test" : "test=bench&engine=verovio&mode=system&n=2000"
+  }
+]
