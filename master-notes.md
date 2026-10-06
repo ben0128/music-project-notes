@@ -1,6 +1,6 @@
 # AI Music Project — Master Notes
 
-> 最後更新：2026-10-04
+> 最後更新：2026-10-06
 > 這是專案的唯一正文。原始整理保存在 `sources/`：ChatGPT 版 `chatgpt-summary-2026-10-04.md`、Claude 版 `claude-summary-2026-10-04.md`。
 > 狀態標記：**明確決策**＝使用者明確選定／**討論提案**＝提過但沒定案／**待確認**＝有傾向或前提但未拍板，或屬調研資訊需自行驗證／**已被取代**＝曾提出，但後來的決策讓它不再適用／**暫緩**＝使用者決定之後再處理。
 > 來源標記：[G#]＝ChatGPT 聊天，[C#]＝Claude 聊天（編號對照見文末「來源」）；[確認 10-04]＝使用者在 2026-10-04 合併兩份筆記時親自確認。
@@ -17,6 +17,8 @@
 商業模式是 **open-core**：樂譜模型、MIDI／MusicXML、Patch、Diff 和本地編輯器開源；AI、雲端、同步、協作和 AI 轉譜收費，轉譜沒有免費額度。樂譜存在**使用者自己的 GitHub repo** 做版本控制，Mac App 裡有一個按鈕可以直接存檔並 commit；把網址裡的 github.com 換成我們的網域，就會在網頁檢視器裡看到那份譜。[確認 10-04]
 
 架構定為「一份 TypeScript 核心＋Mac／Windows 的 WebView 外殼」，排版引擎用 **Verovio**（搭配逐行快取）；資料庫、STT、LLM 供應商，以及 Jev 是否採用，都還沒定案。
+
+競品調查（2026-10-06）見 `research/competitors-2026-10.md`：近五年沒有新的寫譜軟體擠進主流；MuseScore 已推出免費的圖片轉譜和音訊轉譜（音訊目前只有鋼琴和木吉他）；Klangio 的鼓譜轉譜已透過 Muse Group 的 MuseHub 發行，可以接 MuseScore 編輯。[C12]
 
 ```text
 上傳音訊 ─► Klangio API 轉譜 ─► 後處理／轉入內部模型 ─► 編輯器（五線譜）
@@ -48,6 +50,15 @@
   - Klangio Drum2Notes：有 API、線上編輯器，可匯出 MusicXML／MIDI／PDF；App Store 評分約 3.8，有使用者抱怨結果和原曲無關。
   - Paradiddle：三個模型投票，公開的 F1 為 0.86，會標示不確定的擊點讓使用者確認，並拿來當訓練資料；沒看到對外 API；使用者當時找不到它的網站。
   - DrumScript（開源、規則式）、AnthemScore（編輯功能弱）、Drumscrib、DrumConvert、NotaGen。[C2]
+- **待確認**　競品更新（2026-10-06，需自行驗證，細節見 `research/competitors-2026-10.md`）：[C12]
+  - 主流格局沒變：MuseScore Studio（使用者最多）、Sibelius（付費市場領導者）、Dorico（專業採用成長）；Finale 2024 年停止開發。
+  - Muse Group 幾乎涵蓋整條產業鏈（寫譜、樂譜分享、音色、MuseHub 發行、Audacity、Hal Leonard 出版與零售），商業模式就是 open-core。
+  - MuseScore 的 AI：NoteVision 圖片轉譜（2025-07，改成免費加付費）；Audio-to-Score 音訊轉譜 beta（2026-08，免費，自家模型，目前只有鋼琴和木吉他，沒提到鼓）。
+  - Klangio 的 Transcription Studio 支援鼓，透過 MuseHub 發行，可以匯出到 MuseScore 編輯：「上傳音訊 → 鼓譜轉譜 → 編輯」這條流程已經被組合出來。
+  - AI 轉譜新進者：Songscription（2025-06 上線，鋼琴最可靠，自稱 15 萬名使用者）。
+  - Muse Group 的調查（2026-04，1,200 位美國音樂人）：78% 願意用 AI 工具，只有 18% 接受 AI 直接生成整首音樂，而且要能編輯。
+- **討論提案**　第二個輸入管道「圖片／PDF 轉譜（OMR）」：評估見 `research/image-to-score-omr-2026-10.md`。建議現在不要自建也先不外購；先把 MusicXML 匯入做紮實（本來就要接 Klangio 的輸出），讓使用者能用 Soundslice、Flat、NoteVision 轉好再匯入，並建一份有權利來源的真實鼓譜評測集。理由：八家工具宣稱支援鼓譜但都沒有獨立品質數據；能商用的 OMR API 只有 Flat；通用多模態 LLM 讀譜很弱；需求多半是「想聽、想練」；上傳買來的譜到雲端再推進 GitHub 有著作權摩擦。等評測和使用數據支持，再把外部 OMR 包成付費功能（只做乾淨數位 PDF、單一五線鼓組譜，每份譜請使用者確認一次 legend 對應）。[C12]
+- **討論提案**　差異化要放在 Klangio＋MuseScore 這條流程沒有的地方：鼓譜專屬的修正體驗、語音和 AI 改譜、beat 級 diff、使用者自己的 GitHub 版控；定位成和 MuseScore 互補（`score.musicxml` 可以直接用 MuseScore 開），比取代它合理。[C12]
 - **待確認**　宣傳影片已經做好（30 秒、1080p），用的是暫定名「打譜」和 slogan「上傳 轉譜 開打」。影片把語音編輯呈現成已經有的功能。[C9]
 
 ## 2. UX / User Flow
@@ -126,6 +137,7 @@
   - 錯誤處理和費用
   - 鼓譜的實際品質
   - 服務條款是否允許用它的輸出訓練模型
+- **待確認**　供應商風險：Klangio 已和 Muse Group 合作（Transcription Studio 透過 MuseHub 發行，支援鼓，可接 MuseScore 編輯）。轉譜引擎要保留可替換的介面。[C12]
 - **討論提案**　如果引擎只輸出 MIDI，需要後處理（量化、推斷拍號、分離聲部），再用 MuseScore CLI 或 Verovio 渲染。[C8]
 - **討論提案**　準確度評估：用 precision／recall／F，容錯窗 ±50ms，分鼓種看（hi-hat 通常比較低）。標準答案可以用使用者修正後的資料。[C2]
 - **討論提案**　拍號可以用重音的週期來推估，但變拍（例如 progressive metal）自動判斷不可靠，要交給人確認。[C2]
@@ -305,6 +317,7 @@ User request
   ```
 
 - **明確決策**　AI 轉譜全部付費，沒有免費額度。免費的只有開源部分。[確認 10-04]
+- **待確認**　競品壓力：MuseScore 的音訊轉譜和圖片轉譜都有免費方案；如果之後免費支援鼓，「AI 轉譜全部付費」會直接面對免費對手。Claude 的建議是把收費價值放在修正體驗和 AI 改譜，而不是轉譜本身。決策沒有改，只是記下風險。[C12]
 - **明確決策**　付費的 Sync：由我們自動幫使用者同步，使用者不用自己串接外部的 GitHub，隱私性也比較好。**先不做**，第一階段以 GitHub 為主。[確認 10-04]
 - **暫緩**　開源部分用哪一種授權，之後再決定。[確認 10-04]
 - **已被取代**　使用者原本提出分方案：基本版走單一路徑；進階版有 Demucs、沒有 Demucs 兩路都跑，再比對結果。Claude 建議基本版免費、進階版（兩路融合）收費，兩路結果不一致的地方在編輯器標示「請確認」。這個分法已經被「轉譜全部付費」取代。不過「兩路結果不一致就標示請確認」的做法，日後自建模型時仍可參考。[C2][確認 10-04]
@@ -468,6 +481,10 @@ User request
 25. 資料飛輪要讀使用者的 repo：需要哪些權限？使用者同意和隱私條款怎麼處理？
 26. 還沒發佈過的譜（repo 裡沒有 PDF），換網域打開時要顯示什麼？例如顯示「尚未發佈」加上「用 Mac App 開啟」。
 27. 發佈時 PDF 存在哪裡：commit 進使用者的 repo，還是放在別的地方？
+28. 面對 MuseScore 免費的音訊轉譜（可能擴充到鼓）和 Klangio＋MuseHub 的組合，「AI 轉譜全部付費」要不要調整？差異化的優先順序？
+29. 要不要透過 MuseHub 發行 Mac App？上架條件還沒查。
+30. 開源授權如果選和 GPL 相容的授權，就能參考或沿用 MuseScore 的部分程式碼；要和第 20 項一起決定。
+31. 圖片／PDF 轉譜要不要做、什麼時候做？Klangio 能不能透過 API 開放 Scan2Notes？Flat OMR API 的點數價格和鼓譜品質如何？
 
 ## 16. 來源
 
@@ -493,6 +510,7 @@ User request
 - [C9] [鼓譜轉譜專案的下一步方向](https://claude.ai/chat/1a4645c5-bdd1-4710-8c9b-7bcd93d7a5c5)（2026-09-28）
 - [C10] [鼓谱编辑界面的 AI 改动可视化设计](https://claude.ai/chat/a7e492da-75b3-457a-ab73-310f8737e907)（2026-09-29）
 - [C11] [中英雙語電商客服 Agent 技術文件規劃](https://claude.ai/chat/4a84dd18-0beb-4773-bdc3-c565974f479b)（2026-10-03）：只間接提到 Jev 比較適合鼓譜專案的單句指令，沒有新增專案內容。
+- [C12] [Claude Code：架構與競品討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）。
 
 ## 更新紀錄
 
@@ -501,3 +519,4 @@ User request
 - 2026-10-04：加入使用者確認的決策：編輯只在 Mac 原生 App 做、網頁版只能瀏覽（原本的「網頁工具」標成已被取代）；換網域打開網頁檢視器；Mac App 串接 GitHub、一鍵 commit；repo 的檔案結構（`score.json`、自動產生的 `score.musicxml`、`transcription.json`）；Klangio 原始結果做成第一個 commit；資料飛輪比對第一版和後續 commit；付費 Sync 之後再做；開源授權暫緩。未決問題第 20–25 條改寫。
 - 2026-10-05：加入使用者確認的決策：iPhone／iPad 只閱讀；網頁和 iPhone／iPad 只顯示 PDF，PDF 在發佈或匯出時才產生；架構定為一份 TS 核心＋Mac／Windows 的 WebView 外殼；做 spike（關卡 G1–G6），引擎傾向 alphaTab、備案 Verovio。加入換行固定、逐行快取兩個討論提案。未決問題新增第 26、27 條。
 - 2026-10-05：spike 完成，結果寫在 `research/spike-results-2026-10.md`，截圖、PDF、數據放在 `research/spike-2026-10/`。使用者定案 Verovio 搭配逐行快取。
+- 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。另外加入圖片轉譜（OMR）評估（`research/image-to-score-omr-2026-10.md`），第 1 節新增討論提案，未決問題新增第 31 條。
