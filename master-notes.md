@@ -57,6 +57,7 @@
   - Klangio 的 Transcription Studio 支援鼓，透過 MuseHub 發行，可以匯出到 MuseScore 編輯：「上傳音訊 → 鼓譜轉譜 → 編輯」這條流程已經被組合出來。
   - AI 轉譜新進者：Songscription（2025-06 上線，鋼琴最可靠，自稱 15 萬名使用者）。
   - Muse Group 的調查（2026-04，1,200 位美國音樂人）：78% 願意用 AI 工具，只有 18% 接受 AI 直接生成整首音樂，而且要能編輯。
+- **討論提案**　第二個輸入管道「圖片／PDF 轉譜（OMR）」：評估見 `research/image-to-score-omr-2026-10.md`。建議現在不要自建也先不外購；先把 MusicXML 匯入做紮實（本來就要接 Klangio 的輸出），讓使用者能用 Soundslice、Flat、NoteVision 轉好再匯入，並建一份有權利來源的真實鼓譜評測集。理由：八家工具宣稱支援鼓譜但都沒有獨立品質數據；能商用的 OMR API 只有 Flat；通用多模態 LLM 讀譜很弱；需求多半是「想聽、想練」；上傳買來的譜到雲端再推進 GitHub 有著作權摩擦。等評測和使用數據支持，再把外部 OMR 包成付費功能（只做乾淨數位 PDF、單一五線鼓組譜，每份譜請使用者確認一次 legend 對應）。[C12]
 - **討論提案**　差異化要放在 Klangio＋MuseScore 這條流程沒有的地方：鼓譜專屬的修正體驗、語音和 AI 改譜、beat 級 diff、使用者自己的 GitHub 版控；定位成和 MuseScore 互補（`score.musicxml` 可以直接用 MuseScore 開），比取代它合理。[C12]
 - **待確認**　宣傳影片已經做好（30 秒、1080p），用的是暫定名「打譜」和 slogan「上傳 轉譜 開打」。影片把語音編輯呈現成已經有的功能。[C9]
 
@@ -483,6 +484,7 @@ User request
 28. 面對 MuseScore 免費的音訊轉譜（可能擴充到鼓）和 Klangio＋MuseHub 的組合，「AI 轉譜全部付費」要不要調整？差異化的優先順序？
 29. 要不要透過 MuseHub 發行 Mac App？上架條件還沒查。
 30. 開源授權如果選和 GPL 相容的授權，就能參考或沿用 MuseScore 的部分程式碼；要和第 20 項一起決定。
+31. 圖片／PDF 轉譜要不要做、什麼時候做？Klangio 能不能透過 API 開放 Scan2Notes？Flat OMR API 的點數價格和鼓譜品質如何？
 
 ## 16. 來源
 
@@ -508,7 +510,7 @@ User request
 - [C9] [鼓譜轉譜專案的下一步方向](https://claude.ai/chat/1a4645c5-bdd1-4710-8c9b-7bcd93d7a5c5)（2026-09-28）
 - [C10] [鼓谱编辑界面的 AI 改动可视化设计](https://claude.ai/chat/a7e492da-75b3-457a-ab73-310f8737e907)（2026-09-29）
 - [C11] [中英雙語電商客服 Agent 技術文件規劃](https://claude.ai/chat/4a84dd18-0beb-4773-bdc3-c565974f479b)（2026-10-03）：只間接提到 Jev 比較適合鼓譜專案的單句指令，沒有新增專案內容。
-- [C12] [Claude Code：架構與競品討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估。
+- [C12] [Claude Code：架構與競品討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）。
 
 ## 更新紀錄
 
@@ -517,4 +519,4 @@ User request
 - 2026-10-04：加入使用者確認的決策：編輯只在 Mac 原生 App 做、網頁版只能瀏覽（原本的「網頁工具」標成已被取代）；換網域打開網頁檢視器；Mac App 串接 GitHub、一鍵 commit；repo 的檔案結構（`score.json`、自動產生的 `score.musicxml`、`transcription.json`）；Klangio 原始結果做成第一個 commit；資料飛輪比對第一版和後續 commit；付費 Sync 之後再做；開源授權暫緩。未決問題第 20–25 條改寫。
 - 2026-10-05：加入使用者確認的決策：iPhone／iPad 只閱讀；網頁和 iPhone／iPad 只顯示 PDF，PDF 在發佈或匯出時才產生；架構定為一份 TS 核心＋Mac／Windows 的 WebView 外殼；做 spike（關卡 G1–G6），引擎傾向 alphaTab、備案 Verovio。加入換行固定、逐行快取兩個討論提案。未決問題新增第 26、27 條。
 - 2026-10-05：spike 完成，結果寫在 `research/spike-results-2026-10.md`，截圖、PDF、數據放在 `research/spike-2026-10/`。使用者定案 Verovio 搭配逐行快取。
-- 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。
+- 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。另外加入圖片轉譜（OMR）評估（`research/image-to-score-omr-2026-10.md`），第 1 節新增討論提案，未決問題新增第 31 條。
