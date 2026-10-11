@@ -12,7 +12,7 @@
 目前確定的技術選擇有兩項：
 
 - 轉譜引擎用 **Klangio API**。[確認 10-04]
-- 後端用 **Cloudflare serverless**，語言用 TypeScript；上傳的音訊和 Klangio 的轉譜結果都暫存在 R2（TTL 30 天），轉譜結果讓 App 下載，永久儲存在使用者自己的 GitHub。[確認 10-04][確認 10-11]
+- 後端用 **Cloudflare serverless**，語言用 TypeScript；上傳的音訊和 Klangio 的轉譜結果都暫存在 R2（音訊 TTL 1 天、轉譜結果 TTL 14 天），轉譜結果讓 App 下載，永久儲存在使用者自己的 GitHub。[確認 10-04][確認 10-11]
 
 商業模式是 **open-core**：樂譜模型、MIDI／MusicXML、Patch、Diff 和本地編輯器開源；AI、雲端、同步、協作和 AI 轉譜收費，轉譜沒有免費額度。樂譜存在**使用者自己的 GitHub repo** 做版本控制，Mac App 裡有一個按鈕可以直接存檔並 commit；把網址裡的 github.com 換成我們的網域，就會在網頁檢視器裡看到那份譜。[確認 10-04]
 
@@ -294,14 +294,14 @@ User request
   - (c) 音訊只存在瀏覽器的 IndexedDB。
 
   Claude 建議 (b)。改用 Klangio 後，音訊一定要送出去，所以 (a) 已經不適用。這三種做法和下面的 hash 設計都是以瀏覽器為前提（File API、IndexedDB）；改成 Mac App 後，App 可以直接讀本地檔案，「雲端不留音檔、用 hash 配對本地檔案」的概念仍然可以沿用（Claude 註記）。
-- **明確決策**　上傳的音訊暫存在 R2，TTL 30 天；音訊不進使用者的 repo（前面已定）。上傳和刪除的細節見第 11 節。[確認 10-11]
+- **明確決策**　上傳的音訊暫存在 R2，TTL 1 天；音訊不進使用者的 repo（前面已定）。上傳和刪除的細節見第 11 節。[確認 10-11]
 - **待確認**　使用者選擇深入 (b)，並複述了設計：雲端只存音檔的 hash，和譜綁在一起；使用者下次在本地選同一個檔案時，用 hash 配對，再用 File API 在本地播放，不用重新上傳。沒有明確宣告定案。[C2]
 - **討論提案**　hash 的細節：[C2]
   - 整檔算 SHA-256 要用 Web Worker，或只算前幾 MB 加上檔案大小。
   - 使用者轉過檔（MP3 ↔ WAV）導致 hash 不符時，只警告、不阻擋。
   - 對外要講清楚是「只上傳一次」，不是完全不上傳。
 - **討論提案**　使用者提出：讓使用者把音訊放在自己的雲端空間（例如 Google Drive、Dropbox），服務只在處理時暫時讀取。[C2]
-- **待確認**　音訊要不要放進使用者的 GitHub repo？音檔很大，直接放進 git 不適合（可能要用 Git LFS，或音訊另外存放、repo 裡只放 hash）。還沒討論。
+- **已被取代**　音訊要不要放進使用者的 GitHub repo？音檔很大，直接放進 git 不適合（可能要用 Git LFS，或音訊另外存放、repo 裡只放 hash）。還沒討論。→ 被「音訊不進 repo」取代（本節檔案結構的明確決策 [確認 10-04]，2026-10-11 再次確認，包括不用 Git LFS）。[確認 10-11]
 - **待確認**　離線編輯、同步衝突怎麼處理，還沒設計。[C2][G1]
 
 ## 10. Open-core / Free vs Paid
@@ -336,15 +336,15 @@ User request
 
 - **明確決策**　後端用 Cloudflare serverless。[確認 10-04]
 - **明確決策**　後端語言用 TypeScript。[確認 10-11]
-- **明確決策**　Klangio 的轉譜結果先存到 R2，產生一個 URL 讓 Mac App 下載；物件的 TTL 是 30 天，下載完就刪除。永久儲存靠使用者自己的 GitHub repo（App 下載後做成第一個 commit，見第 9 節）。[確認 10-11]
-- **討論提案**　轉譜結果「下載完就刪除」的時機改成 App 回報 commit 和 push 成功之後才刪，30 天的 TTL 當作保底。如果只是下載成功、但 commit 或 push 失敗，R2 上的檔案已經刪掉就救不回來，使用者得重新付費轉譜。[C12]
-- **明確決策**　上傳的音訊也放在 R2，TTL 30 天。[確認 10-11]
+- **明確決策**　Klangio 的轉譜結果先存到 R2，產生一個 URL 讓 Mac App 下載；TTL 是 14 天，下載完就刪除。永久儲存靠使用者自己的 GitHub repo（App 下載後做成第一個 commit，見第 9 節）。[確認 10-11]
+- **討論提案**　轉譜結果「下載完就刪除」的時機改成 App 回報 commit 和 push 成功之後才刪，14 天的 TTL 當作保底。如果只是下載成功、但 commit 或 push 失敗，R2 上的檔案已經刪掉就救不回來，使用者得重新付費轉譜。[C12]
+- **明確決策**　上傳的音訊也放在 R2，TTL 1 天。[確認 10-11]
 - **明確決策**　Cloud、Sync、Collaboration 屬於收費部分（見第 10 節）。[確認 10-04]
 - **討論提案**　Cloudflare Worker 當 API 和 orchestration 的入口（範例 endpoint：`POST /chat`），負責呼叫 deterministic rules、Jev、router 和後續的 Agent 或 API。[G2]
-- **待確認**　具體要用哪些 Cloudflare 服務（資料庫、物件儲存、佇列、即時狀態），還沒決定。[G2] 2026-10-11 補充：物件儲存確定用 R2（音訊和轉譜結果，TTL 30 天，見上方），資料庫、佇列、即時狀態仍未決定。[確認 10-11]
+- **待確認**　具體要用哪些 Cloudflare 服務（資料庫、物件儲存、佇列、即時狀態），還沒決定。[G2] 2026-10-11 補充：物件儲存確定用 R2（音訊 TTL 1 天、轉譜結果 TTL 14 天，見上方），資料庫、佇列、即時狀態仍未決定。[確認 10-11]
 - **待確認**　資料庫：先前傾向 Supabase（Postgres + Auth + Storage 一站式；使用者回過「Yeah」，但沒同意記成決策），也比較過自架 VPS + Postgres、Neon（branching）、Firebase、PlanetScale、MongoDB。後端定為 Cloudflare 之後，要重新評估要用 Cloudflare 自己的服務，還是外接 Supabase。[C3]
 - **討論提案**　非同步處理：用佇列，前端用輪詢或 WebSocket 拿進度。[C2]
-- **討論提案**　上傳：用 presigned URL 直接傳到物件儲存；用儲存桶的生命週期規則（例如 24 小時）自動刪除，處理成功時也主動刪；介面上標示「音訊已刪除」，當作讓使用者安心的訊號。[C2] 2026-10-11：儲存位置定為 R2、TTL 定為 30 天，取代這裡「例如 24 小時」的提法；presigned URL、處理成功時主動刪除、介面標示仍是討論提案。[確認 10-11]
+- **討論提案**　上傳：用 presigned URL 直接傳到物件儲存；用儲存桶的生命週期規則（例如 24 小時）自動刪除，處理成功時也主動刪；介面上標示「音訊已刪除」，當作讓使用者安心的訊號。[C2] 2026-10-11：儲存位置定為 R2、TTL 定為 1 天，和這裡「例如 24 小時」一致；presigned URL、處理成功時主動刪除、介面標示仍是討論提案。[確認 10-11]
 - **已被取代**　後端定為 Cloudflare 之後，以下提案不再採用：
   - Python 推論服務 + NestJS gateway [C2]
   - GCP Cloud Run GPU workers + Pub/Sub [C8]
@@ -432,8 +432,8 @@ User request
 | 2026-10-05 | 架構：一份 TS 核心＋Mac／Windows 的 WebView 外殼 | [確認 10-05] |
 | 2026-10-05 | 排版引擎用 Verovio，搭配逐行快取（spike 結果） | [確認 10-05] |
 | 2026-10-11 | 後端語言用 TypeScript | [確認 10-11] |
-| 2026-10-11 | Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，TTL 30 天、下載完刪除；永久儲存在使用者的 GitHub | [確認 10-11] |
-| 2026-10-11 | 上傳的音訊也暫存在 R2，TTL 30 天 | [確認 10-11] |
+| 2026-10-11 | Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，TTL 14 天、下載完刪除；永久儲存在使用者的 GitHub | [確認 10-11] |
+| 2026-10-11 | 上傳的音訊也暫存在 R2，TTL 1 天；音訊不進 repo（包括 Git LFS） | [確認 10-11] |
 
 ## 14. 技術棧總覽
 
@@ -441,7 +441,7 @@ User request
 |---|---|---|
 | Klangio API | 音訊轉譜 | **明確決策**；整合細節待確認 |
 | Cloudflare serverless（Workers） | 後端、API orchestration | **明確決策**；語言用 TypeScript [確認 10-11]；除了 R2 以外，要用哪些服務待確認 |
-| Cloudflare R2 | 上傳音訊和 Klangio 轉譜結果的暫存；轉譜結果透過 URL 讓 App 下載，下載完刪除 | **明確決策**；TTL 30 天；轉譜結果的刪除時機、音訊是否轉譜成功就刪，待確認 |
+| Cloudflare R2 | 上傳音訊和 Klangio 轉譜結果的暫存；轉譜結果透過 URL 讓 App 下載，下載完刪除 | **明確決策**；音訊 TTL 1 天、轉譜結果 TTL 14 天；轉譜結果的刪除時機、音訊是否轉譜成功就刪，待確認 |
 | 使用者自己的 GitHub repo | 樂譜存放、版本控制 | **明確決策** |
 | Canonical Score Model、MIDI／MusicXML 轉換、Patch、Diff、Local Editor | 開源核心 | **明確決策**（開源）；授權待確認 |
 | 一份 TS 核心＋WebView 外殼（Mac：Swift＋WKWebView；Windows：WebView2） | 編輯器 | **明確決策** |
@@ -476,7 +476,7 @@ User request
 10. 語音指令既沒有選取、也沒講明範圍時怎麼辦？使用者傾向自行推論，Claude 建議反問「要套用在哪一段？」。
 11. 「要資料」來回的上限，以及防止無限迴圈的策略（討論在這裡中斷）；模糊的指令（例如「讓副歌更有力」）怎麼處理，還沒展開。
 12. commit／Revision 的定義和資料結構、名稱統一；AI 改動的 commit 要不要直接對應到使用者 repo 裡的 git commit？beat 級的「接受／還原」要不要採用？undo／redo 怎麼設計？
-13. 音訊儲存策略：雲端暫存已定為 R2、TTL 30 天；過期之後要靠 hash 配對本地檔案、使用者自己的雲端空間，還是用 Git LFS 放進使用者的 repo？（已確定音訊不直接進 repo）
+13. 音訊儲存策略：雲端暫存已定為 R2、TTL 1 天；過期之後要靠 hash 配對本地檔案，還是使用者自己的雲端空間？（音訊不進 repo，包括 Git LFS）
 14. 匯出要不要加 Guitar Pro 格式？（MusicXML 和 MIDI 已經確定）
 15. 收費部分怎麼定價、怎麼包裝（訂閱、按首計費，或其他方式）？
 16. 目標客群（自己的錄音 vs 商業歌曲），以及衍生作品的法律風險。Claude 問過目標客群，沒有得到明確的回答。
@@ -495,7 +495,7 @@ User request
 29. 要不要透過 MuseHub 發行 Mac App？上架條件還沒查。
 30. 開源授權如果選和 GPL 相容的授權，就能參考或沿用 MuseScore 的部分程式碼；要和第 20 項一起決定。
 31. 圖片／PDF 轉譜要不要做、什麼時候做？Klangio 能不能透過 API 開放 Scan2Notes？Flat OMR API 的點數價格和鼓譜品質如何？
-32. 轉譜結果「下載完就刪除」是下載成功就刪，還是等 App 回報 commit 和 push 成功才刪？下載用的 URL 要多久過期？上傳的音訊是轉譜成功後就主動刪，還是保留到 30 天的 TTL？
+32. 轉譜結果「下載完就刪除」是下載成功就刪，還是等 App 回報 commit 和 push 成功才刪？下載用的 URL 要多久過期？上傳的音訊是轉譜成功後就主動刪，還是等 1 天的 TTL？
 
 ## 16. 來源
 
@@ -531,4 +531,4 @@ User request
 - 2026-10-05：加入使用者確認的決策：iPhone／iPad 只閱讀；網頁和 iPhone／iPad 只顯示 PDF，PDF 在發佈或匯出時才產生；架構定為一份 TS 核心＋Mac／Windows 的 WebView 外殼；做 spike（關卡 G1–G6），引擎傾向 alphaTab、備案 Verovio。加入換行固定、逐行快取兩個討論提案。未決問題新增第 26、27 條。
 - 2026-10-05：spike 完成，結果寫在 `research/spike-results-2026-10.md`，截圖、PDF、數據放在 `research/spike-2026-10/`。使用者定案 Verovio 搭配逐行快取。
 - 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。另外加入圖片轉譜（OMR）評估（`research/image-to-score-omr-2026-10.md`），第 1 節新增討論提案，未決問題新增第 31 條。
-- 2026-10-11：加入使用者確認的決策：後端語言用 TypeScript；Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，下載完刪除，永久儲存在使用者的 GitHub；上傳的音訊也放在 R2；R2 的 TTL 為 30 天。同步更新摘要、第 9 節（第一個 commit 的流程、音訊）、第 11 節（另加刪除時機的討論提案；音訊上傳提案裡「例如 24 小時」被 30 天取代）、第 13 節 Decision Log、第 14 節技術棧總覽；第 15 節第 6、13 項改寫，新增第 32 項（TTL 長度已定，不列入）。
+- 2026-10-11：加入使用者確認的決策：後端語言用 TypeScript；Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，下載完刪除，TTL 14 天，永久儲存在使用者的 GitHub；上傳的音訊也放在 R2，TTL 1 天；再次確認音訊不進 repo（包括 Git LFS）。同步更新摘要、第 9 節（第一個 commit 的流程、音訊；「音訊要不要放進 repo」的待確認標為已被取代）、第 11 節（另加轉譜結果刪除時機的討論提案）、第 13 節 Decision Log、第 14 節技術棧總覽；第 15 節第 6、13 項改寫，新增第 32 項。
