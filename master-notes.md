@@ -1,6 +1,6 @@
 # AI Music Project — Master Notes
 
-> 最後更新：2026-10-06
+> 最後更新：2026-10-11
 > 這是專案的唯一正文。原始整理保存在 `sources/`：ChatGPT 版 `chatgpt-summary-2026-10-04.md`、Claude 版 `claude-summary-2026-10-04.md`。
 > 狀態標記：**明確決策**＝使用者明確選定／**討論提案**＝提過但沒定案／**待確認**＝有傾向或前提但未拍板，或屬調研資訊需自行驗證／**已被取代**＝曾提出，但後來的決策讓它不再適用／**暫緩**＝使用者決定之後再處理。
 > 來源標記：[G#]＝ChatGPT 聊天，[C#]＝Claude 聊天（編號對照見文末「來源」）；[確認 10-04]＝使用者在 2026-10-04 合併兩份筆記時親自確認。
@@ -12,7 +12,7 @@
 目前確定的技術選擇有兩項：
 
 - 轉譜引擎用 **Klangio API**。[確認 10-04]
-- 後端用 **Cloudflare serverless**。[確認 10-04]
+- 後端用 **Cloudflare serverless**，語言用 TypeScript；Klangio 的轉譜結果先暫存在 R2 讓 App 下載，永久儲存在使用者自己的 GitHub。[確認 10-04][確認 10-11]
 
 商業模式是 **open-core**：樂譜模型、MIDI／MusicXML、Patch、Diff 和本地編輯器開源；AI、雲端、同步、協作和 AI 轉譜收費，轉譜沒有免費額度。樂譜存在**使用者自己的 GitHub repo** 做版本控制，Mac App 裡有一個按鈕可以直接存檔並 commit；把網址裡的 github.com 換成我們的網域，就會在網頁檢視器裡看到那份譜。[確認 10-04]
 
@@ -284,6 +284,7 @@ User request
   - 只有 `score.json` 會被編輯。MusicXML 是匯出的快照，所以不會發生「兩個檔不一致、哪個才對」的問題。
   - 以 JSON 為主，是因為 MusicXML 放不下信心分數、AI 修改紀錄，以及之後多樂器的擴充欄位。
 - **明確決策**　轉譜完成後，App 直接把 Klangio 的原始結果做成**第一個 commit** 並 push。之後 `transcription.json` 不會再被修改，後續的編輯結果都存成新的 commit。[確認 10-04]
+  - 轉譜結果先暫存在 R2，App 從那裡下載後再 commit，見第 11 節。[確認 10-11]
 
 ### 音訊
 
@@ -333,9 +334,12 @@ User request
 ### 後端
 
 - **明確決策**　後端用 Cloudflare serverless。[確認 10-04]
+- **明確決策**　後端語言用 TypeScript。[確認 10-11]
+- **明確決策**　Klangio 的轉譜結果先存到 R2，產生一個 URL 讓 Mac App 下載；物件有 TTL，下載完就刪除。永久儲存靠使用者自己的 GitHub repo（App 下載後做成第一個 commit，見第 9 節）。[確認 10-11]
+- **討論提案**　「下載完就刪除」的時機改成 App 回報 commit 和 push 成功之後才刪，TTL 當作保底。如果只是下載成功、但 commit 或 push 失敗，R2 上的檔案已經刪掉就救不回來，使用者得重新付費轉譜。[C12]
 - **明確決策**　Cloud、Sync、Collaboration 屬於收費部分（見第 10 節）。[確認 10-04]
 - **討論提案**　Cloudflare Worker 當 API 和 orchestration 的入口（範例 endpoint：`POST /chat`），負責呼叫 deterministic rules、Jev、router 和後續的 Agent 或 API。[G2]
-- **待確認**　具體要用哪些 Cloudflare 服務（資料庫、物件儲存、佇列、即時狀態），還沒決定。[G2]
+- **待確認**　具體要用哪些 Cloudflare 服務（資料庫、物件儲存、佇列、即時狀態），還沒決定。[G2] 2026-10-11 補充：轉譜結果的暫存確定用 R2（見上方），資料庫、佇列、即時狀態仍未決定。[確認 10-11]
 - **待確認**　資料庫：先前傾向 Supabase（Postgres + Auth + Storage 一站式；使用者回過「Yeah」，但沒同意記成決策），也比較過自架 VPS + Postgres、Neon（branching）、Firebase、PlanetScale、MongoDB。後端定為 Cloudflare 之後，要重新評估要用 Cloudflare 自己的服務，還是外接 Supabase。[C3]
 - **討論提案**　非同步處理：用佇列，前端用輪詢或 WebSocket 拿進度。[C2]
 - **討論提案**　上傳：用 presigned URL 直接傳到物件儲存；用儲存桶的生命週期規則（例如 24 小時）自動刪除，處理成功時也主動刪；介面上標示「音訊已刪除」，當作讓使用者安心的訊號。[C2]
@@ -425,13 +429,16 @@ User request
 | 2026-10-05 | iPhone／iPad 只閱讀；網頁和 iPhone／iPad 只顯示 PDF，PDF 在發佈或匯出時才產生 | [確認 10-05] |
 | 2026-10-05 | 架構：一份 TS 核心＋Mac／Windows 的 WebView 外殼 | [確認 10-05] |
 | 2026-10-05 | 排版引擎用 Verovio，搭配逐行快取（spike 結果） | [確認 10-05] |
+| 2026-10-11 | 後端語言用 TypeScript | [確認 10-11] |
+| 2026-10-11 | Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，有 TTL、下載完刪除；永久儲存在使用者的 GitHub | [確認 10-11] |
 
 ## 14. 技術棧總覽
 
 | 技術／元件 | 角色 | 狀態 |
 |---|---|---|
 | Klangio API | 音訊轉譜 | **明確決策**；整合細節待確認 |
-| Cloudflare serverless（Workers） | 後端、API orchestration | **明確決策**；要用哪些服務待確認 |
+| Cloudflare serverless（Workers） | 後端、API orchestration | **明確決策**；語言用 TypeScript [確認 10-11]；除了 R2 以外，要用哪些服務待確認 |
+| Cloudflare R2 | Klangio 轉譜結果暫存，App 透過 URL 下載（TTL、下載完刪除） | **明確決策**；TTL 長度和刪除時機待確認 |
 | 使用者自己的 GitHub repo | 樂譜存放、版本控制 | **明確決策** |
 | Canonical Score Model、MIDI／MusicXML 轉換、Patch、Diff、Local Editor | 開源核心 | **明確決策**（開源）；授權待確認 |
 | 一份 TS 核心＋WebView 外殼（Mac：Swift＋WKWebView；Windows：WebView2） | 編輯器 | **明確決策** |
@@ -459,7 +466,7 @@ User request
 3. 用了 Klangio 之後，哪些後處理（量化、拍號推斷、校正）還需要自己做？
 4. 多樂器的擴充設計：核心模型和工具 schema 怎麼分出「通用」和「各樂器專屬」的部分？
 5. Verovio 的播放怎麼接（Mac：`AVAudioSequencer`＋`AVAudioUnitSampler` 播 Verovio 產生的 MIDI？）；跨行的延音線、連結線在逐行快取下怎麼處理；某一行太擠時的自動局部重排。
-6. Cloudflare 上要用哪些服務？資料庫用 Cloudflare 自己的，還是外接 Supabase？
+6. Cloudflare 上除了 R2（轉譜結果暫存）以外，還要用哪些服務？資料庫用 Cloudflare 自己的，還是外接 Supabase？
 7. Jev 要不要用？用在最上層路由，還是編輯指令分類？中文分類效果如何？early access 的穩定性風險？
 8. LLM 供應商和型號（Claude、GPT 或其他），要不要依任務複雜度路由？
 9. STT 要用什麼（Whisper、GCP、ElevenLabs Scribe）？改成 Mac App 之後，在本機做語音轉文字又變成可行的選項，要一起評估。
@@ -485,6 +492,7 @@ User request
 29. 要不要透過 MuseHub 發行 Mac App？上架條件還沒查。
 30. 開源授權如果選和 GPL 相容的授權，就能參考或沿用 MuseScore 的部分程式碼；要和第 20 項一起決定。
 31. 圖片／PDF 轉譜要不要做、什麼時候做？Klangio 能不能透過 API 開放 Scan2Notes？Flat OMR API 的點數價格和鼓譜品質如何？
+32. 轉譜結果在 R2 的 TTL 要多長？「下載完就刪除」是下載成功就刪，還是等 App 回報 commit 和 push 成功才刪？下載用的 URL 要多久過期？
 
 ## 16. 來源
 
@@ -520,3 +528,4 @@ User request
 - 2026-10-05：加入使用者確認的決策：iPhone／iPad 只閱讀；網頁和 iPhone／iPad 只顯示 PDF，PDF 在發佈或匯出時才產生；架構定為一份 TS 核心＋Mac／Windows 的 WebView 外殼；做 spike（關卡 G1–G6），引擎傾向 alphaTab、備案 Verovio。加入換行固定、逐行快取兩個討論提案。未決問題新增第 26、27 條。
 - 2026-10-05：spike 完成，結果寫在 `research/spike-results-2026-10.md`，截圖、PDF、數據放在 `research/spike-2026-10/`。使用者定案 Verovio 搭配逐行快取。
 - 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。另外加入圖片轉譜（OMR）評估（`research/image-to-score-omr-2026-10.md`），第 1 節新增討論提案，未決問題新增第 31 條。
+- 2026-10-11：加入使用者確認的決策：後端語言用 TypeScript；Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，有 TTL、下載完刪除，永久儲存在使用者的 GitHub。同步更新摘要、第 9 節、第 11 節（另加刪除時機的討論提案）、第 13 節 Decision Log、第 14 節技術棧總覽；第 15 節第 6 項改寫（物件儲存已定），新增第 32 項。
