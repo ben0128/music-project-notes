@@ -1,0 +1,8 @@
+# 投影片與論文只放本機，不進 repo（著作權屬原作者）
+slides/
+readings/
+*.pdf
+*.tmp
+
+.DS_Store
+.env
