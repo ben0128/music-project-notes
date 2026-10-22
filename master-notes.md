@@ -109,6 +109,12 @@
   - W5：接上 STT，完成「說話 → 指令 → 改譜」
   - 第二階段（10/26–11/22）：做出語音編輯 MVP
   [C7]
+- **討論提案**　自學 Stanford CS329Z: Engineering AI Agents（Fall 2026），資料放在 `study/cs329z/`（課綱摘要、每週閱讀清單、筆記、投影片與論文下載腳本）。和專案直接相關的單元：[C12]
+  - W2 structured output、context engineering：語音指令轉成結構化 Patch
+  - W3 Tool Use、MCP：鼓譜編輯工具的 schema，以及把編輯功能包成 MCP server（第 6 節，選做）
+  - W6 資料飛輪、W7 從 trace 建資料集：使用者修正資料的回饋（第 12 節）
+  - W7 eval 基礎、W8 LLM-as-Judge：100 句口語指令測試集與評分（第 7 節）
+  可以和上面那份 16 週時程一起排。
 - **已被取代**　「先不做 Demucs」「先跑原始模型、不先微調」：這兩點是在自建模型的前提下討論的。改用 Klangio 之後，這些變成日後自建模型時才需要考慮的事。[C2]
 
 ## 4. Internal Music Model
@@ -527,7 +533,7 @@ User request
 - [C9] [鼓譜轉譜專案的下一步方向](https://claude.ai/chat/1a4645c5-bdd1-4710-8c9b-7bcd93d7a5c5)（2026-09-28）
 - [C10] [鼓谱编辑界面的 AI 改动可视化设计](https://claude.ai/chat/a7e492da-75b3-457a-ab73-310f8737e907)（2026-09-29）
 - [C11] [中英雙語電商客服 Agent 技術文件規劃](https://claude.ai/chat/4a84dd18-0beb-4773-bdc3-c565974f479b)（2026-10-03）：只間接提到 Jev 比較適合鼓譜專案的單句指令，沒有新增專案內容。
-- [C12] [Claude Code：架構與競品討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）。
+- [C12] [Claude Code：架構、競品與學習資料討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06～10-11）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）、學習資料（`study/cs329z/`）。
 
 ## 更新紀錄
 
@@ -538,4 +544,5 @@ User request
 - 2026-10-05：spike 完成，結果寫在 `research/spike-results-2026-10.md`，截圖、PDF、數據放在 `research/spike-2026-10/`。使用者定案 Verovio 搭配逐行快取。
 - 2026-10-06：加入競品調查（`research/competitors-2026-10.md`）：第 1 節新增競品更新和差異化提案，第 5 節新增 Klangio 供應商風險，第 10 節新增免費競品對收費設計的壓力（決策未改），未決問題新增第 28–30 條，來源新增 [C12]。另外加入圖片轉譜（OMR）評估（`research/image-to-score-omr-2026-10.md`），第 1 節新增討論提案，未決問題新增第 31 條。
 - 2026-10-11：加入使用者確認的決策：後端語言用 TypeScript；Klangio 轉譜結果暫存在 R2，App 透過 URL 下載，下載完刪除，TTL 14 天，永久儲存在使用者的 GitHub；上傳的音訊也放在 R2，TTL 1 天，轉譜成功後不主動刪除、等 TTL 自動刪除；再次確認音訊不進 repo（包括 Git LFS）。同步更新摘要、第 9 節（第一個 commit 的流程、音訊；「音訊要不要放進 repo」的待確認標為已被取代）、第 11 節（另加轉譜結果刪除時機的討論提案；音訊上傳提案裡「處理成功時也主動刪」標為已被取代）、第 13 節 Decision Log、第 14 節技術棧總覽；第 15 節第 6、13 項改寫，新增第 32 項（音訊的刪除方式已定，不列入）。
+- 2026-10-11：第 3 節新增討論提案，指到 `study/cs329z/`（CS329Z 自學資料），列出和專案直接相關的單元；來源 [C12] 補上學習資料。沒有新的明確決策，第 13、14 節不變；未決問題不變。
 - 2026-10-22：加入使用者確認的決策：本地音檔配對用 SHA-256 比對，hash 對不上（例如轉過檔）只警告、不阻擋，並讓使用者手動選擇音檔。第 9 節「雲端只存 hash、用 hash 配對本地檔案」由待確認改為明確決策；「用音訊指紋取代 SHA-256」標為已被取代。第 11 節新增 Rust 評估的討論提案（Worker 和 TS 核心維持 TS，Rust 只留給日後 CPU 密集的純運算）。同步更新第 13 節 Decision Log、第 14 節 Cloudflare Workers 那列。第 15 節移除原第 13 項（音訊過期後靠 hash 配對本地檔案，已由本次決策解決），後面的編號往前移一號，原第 30 項裡的「第 20 項」改為「第 19 項」；新增第 32 項（onset 對齊）。

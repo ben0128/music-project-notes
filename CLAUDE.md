@@ -1,5 +1,5 @@
 # 專案說明
-這個 repo 是 AI 鼓譜專案的筆記。master-notes.md 是唯一正文（SSOT），原始整理放在 sources/，調研放在 research/。
+這個 repo 是 AI 鼓譜專案的筆記。master-notes.md 是唯一正文（SSOT），原始整理放在 sources/，調研放在 research/，spike 留下來值得沿用的程式碼放在 spike/。
 
 # 更新 master-notes.md 的規則
 1. 先完整讀過 master-notes.md，沿用既有的章節結構、用詞和標記，不要重寫或重排無關的段落。
@@ -16,3 +16,15 @@
 - 開 PR 到 main，描述裡列出新增、修改、標為已被取代的項目，以及需要確認的地方
 - 如果和現有未合併的 PR 有衝突，在描述裡註明
 - 不要 merge，等使用者審過再合
+
+# 工作方式
+- 多步驟的修改先列計劃（要改哪些檔案、新增哪些），使用者說 go 才動手。單行修正或使用者說「直接做」的除外。
+- 未經同意不要安裝任何套件（npm、pip、cargo 等）。
+- 規格沒寫、自己決定的地方，做完要主動說明選了什麼、為什麼。
+- 之後若加入程式碼，改完要跑建置／型別檢查，零錯誤才算完成。
+
+# 在哪裡討論
+- 主要在 Claude Code 雲端 session（手機或網頁的 Code 分頁）討論，選這個 repo。結論照上面的規則寫進 master-notes.md，再照 Git 規則開 PR。
+- 一般聊天（claude.ai、手機 App 的對話）只能讀 repo，不能推。在那邊討論出結論時，請它整理成摘要，貼到 Code 分頁寫進筆記。
+- 在 Mac 上接手雲端 session 用 `claude --teleport`；在 Mac 上開始前先 `git pull`。
+- 2026-10-04 提過的「手機 AI 只能新增的收件匣」（Cloudflare Worker 或 GitHub Issues）：Claude 這邊已被取代，改成在 Code 分頁直接開 PR [確認 10-18]；手機版 ChatGPT 仍然無法寫入，這部分暫緩。
