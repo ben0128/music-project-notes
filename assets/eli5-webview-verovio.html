@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鼓譜 App 的三層盒子</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+/* Layout: one narrow column of big pictures, each with one short caption. Colors = the three nested layers. */
+:root {
+  --bg: #F3F5F8;
+  --paper: #FFFFFF;
+  --ink: #17202B;
+  --muted: #586374;
+  --line: #D3DAE3;
+  --app: #E4E8EE;   --app-s: #7D8A9C;
+  --view: #DAE9F9;  --view-s: #2E6CB0;
+  --brain: #DFF0E6; --brain-s: #2B7A4F;
+  --eng: #FAE9C4;   --eng-s: #9C660B;
+  --font-body: "Noto Sans TC", "PingFang TC", "Heiti TC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F141B; --paper: #171F29; --ink: #E7ECF2; --muted: #9AA6B5; --line: #2B3543;
+    --app: #1D2631; --app-s: #6E7C90;
+    --view: #12273D; --view-s: #6DA6E4;
+    --brain: #11281B; --brain-s: #69C291;
+    --eng: #35270B; --eng-s: #E2A94B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F141B; --paper: #171F29; --ink: #E7ECF2; --muted: #9AA6B5; --line: #2B3543;
+  --app: #1D2631; --app-s: #6E7C90;
+  --view: #12273D; --view-s: #6DA6E4;
+  --brain: #11281B; --brain-s: #69C291;
+  --eng: #35270B; --eng-s: #E2A94B;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 56px;
+}
+h1 {
+  font-size: clamp(30px, 7vw, 46px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: balance;
+}
+h2 {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: 900;
+  line-height: 1.3;
+  margin: 0;
+  text-wrap: balance;
+}
+p { margin: 0; max-width: 34em; }
+.lede { color: var(--muted); font-size: 18px; }
+section { display: grid; gap: 18px; }
+.m { font-family: var(--font-mono); font-weight: 500; }
+figure { margin: 0; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--font-body); fill: var(--ink); }
+svg .mono { font-family: var(--font-mono); }
+svg .sub { fill: var(--muted); }
+.app   { fill: var(--app);   stroke: var(--app-s);   stroke-width: 2.5; }
+.view  { fill: var(--view);  stroke: var(--view-s);  stroke-width: 2.5; }
+.brain { fill: var(--brain); stroke: var(--brain-s); stroke-width: 2.5; }
+.eng   { fill: var(--eng);   stroke: var(--eng-s);   stroke-width: 2.5; }
+.paper { fill: var(--paper); stroke: var(--line);    stroke-width: 2; }
+.ink-s { stroke: var(--ink); fill: none; }
+.ink-f { fill: var(--ink); }
+.arrow { stroke: var(--ink); stroke-width: 3; fill: none; }
+.dot-r { fill: #EC6A5E; } .dot-y { fill: #F4BF4F; } .dot-g { fill: #61C554; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 640px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.card .name { font-family: var(--font-mono); font-weight: 700; font-size: 20px; }
+.card .what { font-weight: 700; }
+.card p { color: var(--muted); font-size: 15px; }
+.card svg { width: 72px; }
+.c-view  { border-color: var(--view-s); }
+.c-eng   { border-color: var(--eng-s); }
+.c-plain { border-style: dashed; }
+
+.seq {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  overflow-x: auto;
+}
+.seq pre { margin: 0; }
+.note {
+  font-size: 14px;
+  color: var(--muted);
+  border-top: 2px solid var(--line);
+  padding-top: 14px;
+}
+</style>
+</head>
+<body style="margin:0">
+<div class="wrap">
+
+  <header style="display:grid;gap:14px">
+    <h1>一個盒子裝一個盒子</h1>
+    <p class="lede">鼓譜 App 像三層套盒：最外面是 App，中間是 <span class="m">WKWebView</span>，最裡面是畫譜的 <span class="m">Verovio</span>。</p>
+  </header>
+
+  <!-- Big picture: the nesting -->
+  <figure aria-label="鼓譜 App 裡面裝著 WKWebView，WKWebView 裡面有 TS 核心和 Verovio，Verovio 畫出鼓譜">
+    <svg viewBox="0 0 600 560" role="img">
+      <!-- Mac App window -->
+      <rect class="app" x="8" y="8" width="584" height="544" rx="20"/>
+      <circle class="dot-r" cx="36" cy="34" r="7"/>
+      <circle class="dot-y" cx="58" cy="34" r="7"/>
+      <circle class="dot-g" cx="80" cy="34" r="7"/>
+      <text x="300" y="41" text-anchor="middle" font-size="21" font-weight="900">鼓譜 App</text>
+      <text x="572" y="41" text-anchor="end" font-size="15" class="sub">Swift 外殼</text>
+
+      <!-- WKWebView -->
+      <rect class="view" x="30" y="66" width="540" height="464" rx="14"/>
+      <text x="52" y="102" font-size="20" font-weight="700" class="mono">WKWebView</text>
+      <text x="196" y="102" font-size="16" class="sub">App 裡的小瀏覽器</text>
+
+      <!-- TS core -->
+      <rect class="brain" x="52" y="126" width="220" height="120" rx="12"/>
+      <text x="162" y="178" text-anchor="middle" font-size="23" font-weight="900">TS 核心</text>
+      <text x="162" y="212" text-anchor="middle" font-size="16" class="sub">大腦：記住每一拍</text>
+
+      <!-- arrow core -> verovio -->
+      <path class="arrow" d="M278 186 H318"/>
+      <path class="ink-f" d="M326 186 l-12 -8 v16 z"/>
+
+      <!-- Verovio -->
+      <rect class="eng" x="328" y="126" width="220" height="120" rx="12"/>
+      <text x="438" y="178" text-anchor="middle" font-size="23" font-weight="900" class="mono">Verovio</text>
+      <text x="438" y="212" text-anchor="middle" font-size="16" class="sub">畫譜機：資料變成圖</text>
+
+      <!-- arrow verovio -> score -->
+      <path class="arrow" d="M438 250 V284"/>
+      <path class="ink-f" d="M438 294 l-8 -12 h16 z"/>
+
+      <!-- rendered drum bar -->
+      <rect class="paper" x="52" y="298" width="496" height="210" rx="12"/>
+      <g class="ink-s" stroke-width="1.6">
+        <path d="M80 362 H520 M80 374 H520 M80 386 H520 M80 398 H520 M80 410 H520"/>
+        <path d="M80 362 V410 M520 362 V410"/>
+      </g>
+      <!-- percussion clef -->
+      <rect class="ink-f" x="96" y="374" width="4" height="24"/>
+      <rect class="ink-f" x="104" y="374" width="4" height="24"/>
+      <!-- hi-hat x noteheads (8 eighths) -->
+      <g class="ink-s" stroke-width="2.4">
+        <path d="M134 350 l10 10 M144 350 l-10 10"/>
+        <path d="M184 350 l10 10 M194 350 l-10 10"/>
+        <path d="M234 350 l10 10 M244 350 l-10 10"/>
+        <path d="M284 350 l10 10 M294 350 l-10 10"/>
+        <path d="M334 350 l10 10 M344 350 l-10 10"/>
+        <path d="M384 350 l10 10 M394 350 l-10 10"/>
+        <path d="M434 350 l10 10 M444 350 l-10 10"/>
+        <path d="M484 350 l10 10 M494 350 l-10 10"/>
+      </g>
+      <!-- snare on 2 and 4 -->
+      <g class="ink-f">
+        <ellipse cx="239" cy="380" rx="7" ry="5.2" transform="rotate(-20 239 380)"/>
+        <ellipse cx="439" cy="380" rx="7" ry="5.2" transform="rotate(-20 439 380)"/>
+        <!-- kick on 1, 3, and-of-3 -->
+        <ellipse cx="139" cy="404" rx="7" ry="5.2" transform="rotate(-20 139 404)"/>
+        <ellipse cx="339" cy="404" rx="7" ry="5.2" transform="rotate(-20 339 404)"/>
+        <ellipse cx="389" cy="404" rx="7" ry="5.2" transform="rotate(-20 389 404)"/>
+      </g>
+      <!-- stems -->
+      <g class="ink-s" stroke-width="1.8">
+        <path d="M145 404 V322 M195 355 V322 M245 380 V322 M295 355 V322"/>
+        <path d="M345 404 V322 M395 404 V322 M445 380 V322 M495 355 V322"/>
+      </g>
+      <!-- beams per beat -->
+      <g class="ink-f">
+        <rect x="144" y="320" width="52" height="6"/>
+        <rect x="244" y="320" width="52" height="6"/>
+        <rect x="344" y="320" width="52" height="6"/>
+        <rect x="444" y="320" width="52" height="6"/>
+      </g>
+      <text x="300" y="456" text-anchor="middle" font-size="18" font-weight="700">你看到的鼓譜</text>
+      <text x="300" y="484" text-anchor="middle" font-size="15" class="sub mono">SVG 圖</text>
+    </svg>
+  </figure>
+
+  <!-- Who is who -->
+  <section>
+    <h2>誰是誰</h2>
+    <div class="cards">
+      <div class="card c-plain">
+        <svg viewBox="0 0 72 56" aria-hidden="true">
+          <rect class="paper" x="3" y="3" width="66" height="50" rx="8" style="stroke-dasharray:5 4"/>
+          <path class="ink-s" stroke-width="2" d="M3 16 H69"/>
+          <circle class="ink-f" cx="12" cy="10" r="2.5"/><circle class="ink-f" cx="20" cy="10" r="2.5"/>
+          <path class="ink-s" stroke-width="2" d="M14 28 H58 M14 37 H48"/>
+        </svg>
+        <div class="name">WebView</div>
+        <div class="what">一種東西的統稱</div>
+        <p>塞在 App 裡的小瀏覽器，讓 App 可以顯示網頁。</p>
+      </div>
+      <div class="card c-view">
+        <svg viewBox="0 0 72 56" aria-hidden="true">
+          <rect class="view" x="3" y="3" width="66" height="50" rx="8"/>
+          <path class="ink-s" stroke-width="2" d="M3 16 H69"/>
+          <circle class="dot-r" cx="12" cy="10" r="2.5"/><circle class="dot-y" cx="20" cy="10" r="2.5"/><circle class="dot-g" cx="28" cy="10" r="2.5"/>
+          <path class="ink-s" stroke-width="2" d="M14 28 H58 M14 37 H48"/>
+        </svg>
+        <div class="name">WKWebView</div>
+        <div class="what">Apple 做的那一款</div>
+        <p>和 Safari 用同一個引擎。我們的 Mac 版用它。</p>
+      </div>
+      <div class="card c-eng">
+        <svg viewBox="0 0 72 56" aria-hidden="true">
+          <rect class="eng" x="3" y="8" width="34" height="40" rx="6"/>
+          <path class="ink-s" stroke-width="2" d="M11 20 h18 M11 28 h18 M11 36 h12"/>
+          <path class="arrow" stroke-width="2.5" d="M40 28 h8"/>
+          <path class="ink-f" d="M53 28 l-7 -5 v10 z"/>
+          <g class="ink-s" stroke-width="1.5"><path d="M55 20 H70 M55 25 H70 M55 30 H70 M55 35 H70"/></g>
+          <ellipse class="ink-f" cx="62" cy="27.5" rx="3" ry="2.2"/>
+        </svg>
+        <div class="name">Verovio</div>
+        <div class="what">畫譜機</div>
+        <p>開源程式。吃樂譜資料，吐出譜的圖。住在 WebView 裡面。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category vs brand -->
+  <section>
+    <h2>WebView 和 WKWebView 的關係，就像「手機」和「iPhone」</h2>
+    <figure aria-label="WebView 是統稱，底下有 Mac 用的 WKWebView 和 Windows 用的 WebView2">
+      <svg viewBox="0 0 600 250" role="img">
+        <rect class="paper" x="8" y="8" width="584" height="234" rx="18" style="stroke-dasharray:8 6"/>
+        <text x="300" y="52" text-anchor="middle" font-size="24" font-weight="900" class="mono">WebView</text>
+        <text x="300" y="80" text-anchor="middle" font-size="16" class="sub">統稱：App 裡的小瀏覽器</text>
+        <rect class="view" x="40" y="104" width="250" height="110" rx="14"/>
+        <text x="165" y="150" text-anchor="middle" font-size="21" font-weight="700" class="mono">WKWebView</text>
+        <text x="165" y="182" text-anchor="middle" font-size="16" class="sub">Mac（現在做）</text>
+        <rect class="app" x="310" y="104" width="250" height="110" rx="14"/>
+        <text x="435" y="150" text-anchor="middle" font-size="21" font-weight="700" class="mono">WebView2</text>
+        <text x="435" y="182" text-anchor="middle" font-size="16" class="sub">Windows（之後）</text>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- Sequence -->
+  <section>
+    <h2>改一拍的時候，誰做什麼</h2>
+    <div class="seq">
+<pre class="mermaid">
+sequenceDiagram
+    actor 你
+    participant W as WKWebView 畫面
+    participant C as TS 核心
+    participant V as Verovio
+    你->>W: 點第 4 小節第 2 拍，改成小鼓
+    W->>C: 這一拍要改
+    C->>C: 改樂譜資料
+    C->>V: 只交出改到的那一行
+    V-->>C: 那一行的新圖（SVG）
+    C->>W: 換掉那一行
+    W-->>你: 看到新的譜
+</pre>
+    </div>
+    <p>只重畫改到的那一行，所以 500 小節的譜改一拍也很快（spike 實測 p95 是 84 ms）。</p>
+  </section>
+
+  <!-- Why -->
+  <section>
+    <h2>為什麼要這樣疊</h2>
+    <figure aria-label="Mac 和 Windows 的外殼不同，裡面的 TS 核心和 Verovio 是同一份">
+      <svg viewBox="0 0 600 300" role="img">
+        <rect class="app" x="8" y="8" width="284" height="284" rx="18"/>
+        <text x="150" y="44" text-anchor="middle" font-size="19" font-weight="900">Mac 外殼</text>
+        <text x="150" y="68" text-anchor="middle" font-size="14" class="sub">Swift ＋ WKWebView</text>
+        <rect class="brain" x="34" y="92" width="232" height="80" rx="12"/>
+        <text x="150" y="140" text-anchor="middle" font-size="19" font-weight="700">TS 核心</text>
+        <rect class="eng" x="34" y="186" width="232" height="80" rx="12"/>
+        <text x="150" y="234" text-anchor="middle" font-size="19" font-weight="700" class="mono">Verovio</text>
+
+        <rect class="app" x="308" y="8" width="284" height="284" rx="18" style="stroke-dasharray:8 6"/>
+        <text x="450" y="44" text-anchor="middle" font-size="19" font-weight="900">Windows 外殼</text>
+        <text x="450" y="68" text-anchor="middle" font-size="14" class="sub">WebView2（之後做）</text>
+        <rect class="brain" x="334" y="92" width="232" height="80" rx="12"/>
+        <text x="450" y="140" text-anchor="middle" font-size="19" font-weight="700">同一份 TS 核心</text>
+        <rect class="eng" x="334" y="186" width="232" height="80" rx="12"/>
+        <text x="450" y="234" text-anchor="middle" font-size="19" font-weight="700">同一份 Verovio</text>
+      </svg>
+    </figure>
+    <p>裡面兩塊只寫一次，Mac 和 Windows 共用。外殼很薄，只負責開視窗、輸出 PDF 這類系統的事。</p>
+  </section>
+
+  <p class="note">依據：<span class="m">master-notes.md</span> 第 11 節「前端」的明確決策（2026-10-05），以及 <span class="m">research/spike-results-2026-10.md</span>。</p>
+
+</div>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "default" });
+</script>
+</body>
+</html>
