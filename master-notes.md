@@ -449,10 +449,38 @@ User request
 - **討論提案**　CI 用 GitHub Actions。原本搭配 Vercel／Render 在 push 時自動部署，現在部署目標要改成 Cloudflare。[C3] 2026-10-31 補充：目前推薦的 Cloudflare 部署分工如下，尚未正式採納，也不代表已完成設定。[G6]
   - **討論提案**　Terraform：管理 R2 Bucket、DNS 等 Cloudflare 基礎設施，設定以程式碼納入版本控制。
   - **討論提案**　Wrangler：管理 Workers 設定與部署；與 Terraform 分清管理範圍，避免重複管理同一項設定。
-  - **討論提案**　Cloudflare Workers Builds：連接 GitHub，負責自動建置與部署，使用 Wrangler 的 Workers 設定。
-  - **討論提案**　GitHub Actions：執行測試、Lint、Type Check；不另設 Workers 部署流程，避免與 Workers Builds 重複部署。
+  - **已被取代**　Cloudflare Workers Builds：連接 GitHub，負責自動建置與部署，使用 Wrangler 的 Workers 設定。→ 在同日補充的 Local → QA → Production 推薦流程中，改由 GitHub Actions 統一編排檢查與部署，不同時啟用 Workers Builds 自動部署；這是推薦方案的調整，不是正式採納決策。[G7]
+  - **已被取代**　GitHub Actions：只執行測試、Lint、Type Check，不另設 Workers 部署流程。→ 被下方 GitHub Actions 統一編排 CI、QA 部署、人工核准與 Production 部署的推薦方案取代。[G7]
+  - **討論提案**　GitHub Actions：統一執行檢查、建置、QA 部署、正式發布核准與部署；實際部署呼叫 Wrangler，避免兩套系統重複發布。[G7]
   - **討論提案**　Preview Environment：測試與正式環境使用分開的 R2 Bucket，並明確設定各環境的 R2 綁定，避免測試讀寫正式資料。
-- **待確認**　上述推薦方案的實作細節：正式部署如何以 CI 檢查通過為前提、Preview 的建立與清理方式，以及 Terraform 的 state 與執行流程，仍需設計與驗證。[G6]
+- **討論提案**　Local → QA → Production：同一版本先部署 QA，驗收通過後人工核准升到 Production；發布綁定 QA 驗過的 commit SHA，不重新抓最新 main。建議保存建置產物，正式部署重用同一份程式產物，環境設定與 Secrets 分開套用。[G7]
+
+  ```mermaid
+  flowchart TD
+      A["本地開發：feature branch"] --> B["建立 PR 到 main"]
+      B --> C["GitHub Actions：Lint、Type Check、測試"]
+      C --> D{"檢查與 Code Review 通過？"}
+      D -->|否| A
+      D -->|是| E["合併 main，固定 commit SHA"]
+      E --> F["建置並保存部署產物"]
+      F --> G["Wrangler 部署 QA"]
+      G --> H["QA：Smoke Test ＋ 人工驗收"]
+      H --> I{"QA 通過？"}
+      I -->|否：修正後重新走 PR| A
+      I -->|是| J["人工核准 Production 發布"]
+      J --> K["Wrangler 部署同一份產物到 Production"]
+      K --> L{"正式環境健康檢查"}
+      L -->|正常| M["完成發布，記錄版本"]
+      L -->|異常| N["回滾到上一個正常版本"]
+  ```
+
+- **討論提案**　環境與發布規則：[G7]
+  - QA 與 Production 使用獨立的 Worker、R2 Bucket、Secrets；Preview 網址本身不代表資源隔離，必須明確綁定不同的 R2。
+  - QA 驗收結果綁定 commit SHA；共用 QA 被新版本覆蓋後，舊版本的驗收結果不能套到新版本。
+  - 目前先使用一套共用 QA；每個 PR 的獨立 Preview 留到有多人並行測試需求時再評估。
+  - Terraform 管理 QA／Production 的 R2、DNS 等基礎設施，有基礎設施變更時才執行，不隨每次應用部署重跑。
+  - 回滾先針對 Worker 版本；R2 資料與基礎設施不會隨程式回滾，破壞性變更需另外規劃。
+- **待確認**　實作前驗證：Wrangler 建置產物跨環境重用與環境設定套用方式、帳號可用的人工核准功能、CI 通過才允許合併與發布的設定、QA 並行部署的控制，以及 Terraform state 與執行流程。若日後導入每個 PR 的 Preview，再設計建立與清理方式。這些仍是流程設計，尚未實作驗證。[G7]
 - **討論提案**　協作分工：在 ChatGPT 討論技術決策，確定要更新 GitHub 時交給 Codex 執行 Repository 修改，將架構討論與實際修改分開；執行時仍以最新 main 的 `master-notes.md` 為唯一正文，依 `CLAUDE.md` 開分支與 PR，由使用者審閱後合併。這是使用者提出的工作方式建議，尚未取代 `CLAUDE.md` 的既有協作規範。[G6]
 - **討論提案**　開發時導入 AI agent：用 Claude Code／Cursor 協助開發，CI 裡讓 agent 做 PR review。[C3]
 - **討論提案**　beta 的 Mac App 從自己的網站下載，用 Apple 公證過的 DMG 安裝檔。Mac App Store 的沙盒會限制檔案存取（曲庫資料夾、配對本機音檔都要使用者先授權），在 App 裡賣轉譜也要走 Apple 內購，被抽 15–30%。要不要上架 App Store 或 MuseHub，等開始收費再決定。（Claude 建議，待確認，見第 15 節）
@@ -554,9 +582,9 @@ User request
 | Langfuse | tracing／evaluation | 只是舉例 |
 | Terraform | R2 Bucket、DNS 等 Cloudflare 基礎設施的版本化管理 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
 | Wrangler | Workers 設定與部署 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
-| Cloudflare Workers Builds | 連接 GitHub，自動建置與部署 Workers | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
-| GitHub Actions | CI：測試、Lint、Type Check；避免與 Workers Builds 重複部署 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
-| Preview Environment | 隔離測試與正式環境的 R2 Bucket 與綁定 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
+| Cloudflare Workers Builds | 原提案：連接 GitHub，自動建置與部署 Workers | **已被取代**；目前推薦改由 GitHub Actions 統一編排部署，不同時啟用 Builds 自動部署 [G6][G7] |
+| GitHub Actions | CI、建置、QA 部署、人工核准及 Production 部署；呼叫 Wrangler | **討論提案**；目前推薦方案，取代原本僅做 CI 的分工，尚未正式採納 [G7] |
+| QA／Production 環境隔離 | 獨立 Worker、R2 Bucket、Secrets；驗收綁定 commit SHA | **討論提案**；先一套共用 QA，每個 PR 的獨立 Preview 日後再評估，尚未正式採納 [G6][G7] |
 | ADTOF／Demucs／自建模型 | 轉譜 | 備案、日後選項 |
 | NestJS、Python 推論服務、GCP Cloud Run、Vercel／Render | 後端 | 已被 Cloudflare 取代 |
 
@@ -608,6 +636,7 @@ User request
 - [G4] 研究 AI Agent系統設計：Agent loop、tools、state、memory、MCP、multi-agent，以及可以對應到 Music Agent 的工具例子。
 - [G5] 介紹 ElevenLabs：Scribe、TTS、realtime voice、Music generation，只當能力參考。
 - [G6] 2026-10-31 使用者在 ChatGPT 提供的 GitHub 更新內容：Cloudflare 部署分工（Terraform、Wrangler、Workers Builds、GitHub Actions、Preview Environment），明確要求記為目前推薦方案而非正式決策；另提出 ChatGPT 討論、Codex 修改 Repository 的協作建議。
+- [G7] 2026-10-31 接續討論 Local → QA → Production：GitHub Actions 統一編排、Wrangler 部署、QA 驗收後人工核准發布同一版本、環境隔離與回滾；使用者要求補進同一 PR。仍記為目前推薦方案，未將要求記錄等同正式採納。
 - （排除）即時語音使用方式：講的是 ChatGPT macOS 版怎麼操作，和產品需求無關。
 
 ### Claude（`sources/claude-summary-2026-10-04.md`，日期是各聊天最後更新日，UTC）
@@ -638,3 +667,4 @@ User request
 - 2026-10-22：加入使用者確認的決策：本地音檔配對用 SHA-256 比對，hash 對不上（例如轉過檔）只警告、不阻擋，並讓使用者手動選擇音檔。第 9 節「雲端只存 hash、用 hash 配對本地檔案」由待確認改為明確決策；「用音訊指紋取代 SHA-256」標為已被取代。第 11 節新增 Rust 評估的討論提案（Worker 和 TS 核心維持 TS，Rust 只留給日後 CPU 密集的純運算）。同步更新第 13 節 Decision Log、第 14 節 Cloudflare Workers 那列。第 15 節移除原第 13 項（音訊過期後靠 hash 配對本地檔案，已由本次決策解決），後面的編號往前移一號，原第 30 項裡的「第 20 項」改為「第 19 項」；新增第 32 項（onset 對齊）。
 - 2026-10-22：用 grill 的方式逐輪討論 beta 需要的功能，加入使用者確認的決策：下一個里程碑是給真實使用者的 beta（上傳、轉譜、手動修正、存檔），AI 改譜放到之後；第一批客群是錄自己練習的鼓手和鼓老師；Klangio 實測先用免費方案；樂譜改存在本機 git（App 內建 isomorphic-git），GitHub 改成選用，兩邊都改過時不 push、由使用者選邊；訓練之後再做，使用者勾選同意後保留音訊、譜和 AI 對話改譜紀錄；書籤和練習模式（只做 Mac 版，書籤存在 `practice.json`，可以播原始錄音、鼓譜音符和節拍器，節拍器和游標跟譜上的 BPM，一個速度控制加三種聲音各自的開關和音量）；播放用 Swift 原生；鼓的音色用 Big Rusty Drums。標為已被取代：第 3 節「還沒界定 MVP 範圍」、16 週時程的「第二階段做語音編輯 MVP」、第 9 節「樂譜存在使用者自己的 GitHub repo」和「在 Mac App 裡串接 GitHub、一鍵 commit」、第 12 節「伺服器怎麼讀到使用者的 repo」。新增調研 `research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`，第 5 節加入 Klangio API 的查證結果，第 10 節補上 Klangio 價格。同步更新摘要、第 1、2、3、5、9、10、11、12 節、第 13 節 Decision Log、第 14 節技術棧總覽、來源 [C12]。第 15 節：第 1、2、5、15、21、24 項改寫；移除原第 32 項（Klangio 的未量化 MIDI 已和原始音訊對齊，不用自己做 onset 對齊）；新增第 32–35 項（錄音和譜的同步、beta 的轉譜費用、Mac App 的發行方式、「聽著選」的做法）。
 - 2026-10-31：第 11 節「開發流程」補充目前推薦的 Cloudflare 部署分工：Terraform 管理基礎設施、Wrangler 管理 Workers 設定與部署、Workers Builds 連接 GitHub 自動建置部署、GitHub Actions 只執行 CI 檢查以避免重複部署、Preview 隔離測試與正式環境的 R2；另列實作細節待確認，以及 ChatGPT 討論、Codex 修改 Repository 的協作建議。第 14 節同步新增或更新相關技術棧列，來源新增 [G6]。全部保留為討論提案或待確認，沒有新的明確決策，第 13 節 Decision Log 與第 15 節既有未決問題不變；沒有標為已被取代的項目。
+- 2026-10-31：補充第 11 節 Local → QA → Production 推薦流程與 Mermaid 圖：GitHub Actions 統一編排 CI 和部署、Wrangler 執行部署，QA 驗收與 Production 發布綁定同一 commit／程式產物；加入人工核准、健康檢查、Worker 回滾、環境隔離與共用 QA 的規則。原 Workers Builds 自動部署與 Actions 僅做 CI 的分工標為「已被取代」（提案調整）；第 14 節同步更新，來源新增 [G7]。實作驗證仍待確認，沒有新的明確決策，Decision Log 不變。
