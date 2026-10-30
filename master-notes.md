@@ -1,6 +1,6 @@
 # AI Music Project — Master Notes
 
-> 最後更新：2026-10-22
+> 最後更新：2026-10-31
 > 這是專案的唯一正文。原始整理保存在 `sources/`：ChatGPT 版 `chatgpt-summary-2026-10-04.md`、Claude 版 `claude-summary-2026-10-04.md`。
 > 狀態標記：**明確決策**＝使用者明確選定／**討論提案**＝提過但沒定案／**待確認**＝有傾向或前提但未拍板，或屬調研資訊需自行驗證／**已被取代**＝曾提出，但後來的決策讓它不再適用／**暫緩**＝使用者決定之後再處理。
 > 來源標記：[G#]＝ChatGPT 聊天，[C#]＝Claude 聊天（編號對照見文末「來源」）；[確認 10-04]＝使用者在 2026-10-04 合併兩份筆記時親自確認。
@@ -446,7 +446,14 @@ User request
 
 ### 開發流程
 
-- **討論提案**　CI 用 GitHub Actions。原本搭配 Vercel／Render 在 push 時自動部署，現在部署目標要改成 Cloudflare。[C3]
+- **討論提案**　CI 用 GitHub Actions。原本搭配 Vercel／Render 在 push 時自動部署，現在部署目標要改成 Cloudflare。[C3] 2026-10-31 補充：目前推薦的 Cloudflare 部署分工如下，尚未正式採納，也不代表已完成設定。[G6]
+  - **討論提案**　Terraform：管理 R2 Bucket、DNS 等 Cloudflare 基礎設施，設定以程式碼納入版本控制。
+  - **討論提案**　Wrangler：管理 Workers 設定與部署；與 Terraform 分清管理範圍，避免重複管理同一項設定。
+  - **討論提案**　Cloudflare Workers Builds：連接 GitHub，負責自動建置與部署，使用 Wrangler 的 Workers 設定。
+  - **討論提案**　GitHub Actions：執行測試、Lint、Type Check；不另設 Workers 部署流程，避免與 Workers Builds 重複部署。
+  - **討論提案**　Preview Environment：測試與正式環境使用分開的 R2 Bucket，並明確設定各環境的 R2 綁定，避免測試讀寫正式資料。
+- **待確認**　上述推薦方案的實作細節：正式部署如何以 CI 檢查通過為前提、Preview 的建立與清理方式，以及 Terraform 的 state 與執行流程，仍需設計與驗證。[G6]
+- **討論提案**　協作分工：在 ChatGPT 討論技術決策，確定要更新 GitHub 時交給 Codex 執行 Repository 修改，將架構討論與實際修改分開；執行時仍以最新 main 的 `master-notes.md` 為唯一正文，依 `CLAUDE.md` 開分支與 PR，由使用者審閱後合併。這是使用者提出的工作方式建議，尚未取代 `CLAUDE.md` 的既有協作規範。[G6]
 - **討論提案**　開發時導入 AI agent：用 Claude Code／Cursor 協助開發，CI 裡讓 agent 做 PR review。[C3]
 - **討論提案**　beta 的 Mac App 從自己的網站下載，用 Apple 公證過的 DMG 安裝檔。Mac App Store 的沙盒會限制檔案存取（曲庫資料夾、配對本機音檔都要使用者先授權），在 App 裡賣轉譜也要走 Apple 內購，被抽 15–30%。要不要上架 App Store 或 MuseHub，等開始收費再決定。（Claude 建議，待確認，見第 15 節）
 
@@ -545,7 +552,11 @@ User request
 | Whisper／GCP STT／ElevenLabs Scribe | 語音轉文字 | 待確認 |
 | Supabase 或 Cloudflare 自己的服務 | 資料庫、Auth、儲存 | 待確認 |
 | Langfuse | tracing／evaluation | 只是舉例 |
-| GitHub Actions | CI | 討論提案；部署目標要改成 Cloudflare |
+| Terraform | R2 Bucket、DNS 等 Cloudflare 基礎設施的版本化管理 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
+| Wrangler | Workers 設定與部署 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
+| Cloudflare Workers Builds | 連接 GitHub，自動建置與部署 Workers | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
+| GitHub Actions | CI：測試、Lint、Type Check；避免與 Workers Builds 重複部署 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
+| Preview Environment | 隔離測試與正式環境的 R2 Bucket 與綁定 | **討論提案**；目前推薦方案，尚未正式採納 [G6] |
 | ADTOF／Demucs／自建模型 | 轉譜 | 備案、日後選項 |
 | NestJS、Python 推論服務、GCP Cloud Run、Vercel／Render | 後端 | 已被 Cloudflare 取代 |
 
@@ -596,6 +607,7 @@ User request
 - [G3] 收集反馈迭代提示詞：使用者回饋、evaluation loop、prompt 版本、Langfuse。
 - [G4] 研究 AI Agent系統設計：Agent loop、tools、state、memory、MCP、multi-agent，以及可以對應到 Music Agent 的工具例子。
 - [G5] 介紹 ElevenLabs：Scribe、TTS、realtime voice、Music generation，只當能力參考。
+- [G6] 2026-10-31 使用者在 ChatGPT 提供的 GitHub 更新內容：Cloudflare 部署分工（Terraform、Wrangler、Workers Builds、GitHub Actions、Preview Environment），明確要求記為目前推薦方案而非正式決策；另提出 ChatGPT 討論、Codex 修改 Repository 的協作建議。
 - （排除）即時語音使用方式：講的是 ChatGPT macOS 版怎麼操作，和產品需求無關。
 
 ### Claude（`sources/claude-summary-2026-10-04.md`，日期是各聊天最後更新日，UTC）
@@ -625,3 +637,4 @@ User request
 - 2026-10-11：第 3 節新增討論提案，指到 `study/cs329z/`（CS329Z 自學資料），列出和專案直接相關的單元；來源 [C12] 補上學習資料。沒有新的明確決策，第 13、14 節不變；未決問題不變。
 - 2026-10-22：加入使用者確認的決策：本地音檔配對用 SHA-256 比對，hash 對不上（例如轉過檔）只警告、不阻擋，並讓使用者手動選擇音檔。第 9 節「雲端只存 hash、用 hash 配對本地檔案」由待確認改為明確決策；「用音訊指紋取代 SHA-256」標為已被取代。第 11 節新增 Rust 評估的討論提案（Worker 和 TS 核心維持 TS，Rust 只留給日後 CPU 密集的純運算）。同步更新第 13 節 Decision Log、第 14 節 Cloudflare Workers 那列。第 15 節移除原第 13 項（音訊過期後靠 hash 配對本地檔案，已由本次決策解決），後面的編號往前移一號，原第 30 項裡的「第 20 項」改為「第 19 項」；新增第 32 項（onset 對齊）。
 - 2026-10-22：用 grill 的方式逐輪討論 beta 需要的功能，加入使用者確認的決策：下一個里程碑是給真實使用者的 beta（上傳、轉譜、手動修正、存檔），AI 改譜放到之後；第一批客群是錄自己練習的鼓手和鼓老師；Klangio 實測先用免費方案；樂譜改存在本機 git（App 內建 isomorphic-git），GitHub 改成選用，兩邊都改過時不 push、由使用者選邊；訓練之後再做，使用者勾選同意後保留音訊、譜和 AI 對話改譜紀錄；書籤和練習模式（只做 Mac 版，書籤存在 `practice.json`，可以播原始錄音、鼓譜音符和節拍器，節拍器和游標跟譜上的 BPM，一個速度控制加三種聲音各自的開關和音量）；播放用 Swift 原生；鼓的音色用 Big Rusty Drums。標為已被取代：第 3 節「還沒界定 MVP 範圍」、16 週時程的「第二階段做語音編輯 MVP」、第 9 節「樂譜存在使用者自己的 GitHub repo」和「在 Mac App 裡串接 GitHub、一鍵 commit」、第 12 節「伺服器怎麼讀到使用者的 repo」。新增調研 `research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`，第 5 節加入 Klangio API 的查證結果，第 10 節補上 Klangio 價格。同步更新摘要、第 1、2、3、5、9、10、11、12 節、第 13 節 Decision Log、第 14 節技術棧總覽、來源 [C12]。第 15 節：第 1、2、5、15、21、24 項改寫；移除原第 32 項（Klangio 的未量化 MIDI 已和原始音訊對齊，不用自己做 onset 對齊）；新增第 32–35 項（錄音和譜的同步、beta 的轉譜費用、Mac App 的發行方式、「聽著選」的做法）。
+- 2026-10-31：第 11 節「開發流程」補充目前推薦的 Cloudflare 部署分工：Terraform 管理基礎設施、Wrangler 管理 Workers 設定與部署、Workers Builds 連接 GitHub 自動建置部署、GitHub Actions 只執行 CI 檢查以避免重複部署、Preview 隔離測試與正式環境的 R2；另列實作細節待確認，以及 ChatGPT 討論、Codex 修改 Repository 的協作建議。第 14 節同步新增或更新相關技術棧列，來源新增 [G6]。全部保留為討論提案或待確認，沒有新的明確決策，第 13 節 Decision Log 與第 15 節既有未決問題不變；沒有標為已被取代的項目。
