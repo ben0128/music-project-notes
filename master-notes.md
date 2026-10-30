@@ -485,6 +485,26 @@ User request
 - **討論提案**　開發時導入 AI agent：用 Claude Code／Cursor 協助開發，CI 裡讓 agent 做 PR review。[C3]
 - **討論提案**　beta 的 Mac App 從自己的網站下載，用 Apple 公證過的 DMG 安裝檔。Mac App Store 的沙盒會限制檔案存取（曲庫資料夾、配對本機音檔都要使用者先授權），在 App 裡賣轉譜也要走 Apple 內購，被抽 15–30%。要不要上架 App Store 或 MuseHub，等開始收費再決定。（Claude 建議，待確認，見第 15 節）
 
+### 第一版平台與 Mac 發行管道
+
+- **討論提案**　目前推薦第一版採「瀏覽器版＋Mac 官網下載版」，Mac App Store 延後到核心流程與收費方式穩定、或有商店安裝需求時再評估。Windows 原生版與 iPhone／iPad 原生 App 不列入目前建議的第一版範圍。使用者認為合理並要求記錄，先保留為推薦方案，不將整組建議視為正式採納。[G8]
+- **待確認**　使用者明確表示瀏覽器版本一定會做；但是否提供完整編輯與練習，仍未選定。既有「網頁只閱讀」決策暫不改寫；若要擴大為瀏覽器編輯器，需另行確認功能範圍，以及和 Mac 版的分工。共用 TypeScript 核心不代表檔案存取、音訊、離線儲存與更新流程可以完全共用。[G8]
+- **討論提案**　優先官網下載的理由：第一版先驗證「上傳 → 轉譜 → 修正 → 練習」，配合現有本地曲庫、git 版控、音檔配對及原生音訊設計，減少同時維護商店審核與購買流程的成本。Mac App 和 Mac App Store 是不同層次：不進商店仍可做原生 App。[G8]
+
+  | 比較 | Mac 官網下載 | Mac App Store |
+  |---|---|---|
+  | 發布與修正 | 自行控制發布節奏；仍需簽章、公證與 QA | 需準備商店資料並配合審核 |
+  | 安裝與信任 | 使用者下載安裝檔，安裝步驟較多 | 商店安裝較熟悉，提供額外展示入口但不保證流量 |
+  | 更新 | 自行整合與維護更新機制 | 由商店提供更新管道 |
+  | 本地檔案 | 彈性較大，仍受 macOS 隱私權限限制 | 需適配沙盒及檔案授權、持久存取 |
+  | 收款 | 自選金流，自行處理退款與權益同步 | 數位功能與訂閱需依適用的商店規則設計 |
+  | 維護成本 | 負責下載、更新及發行安全 | 增加商店審核、政策與可能的雙管道適配成本 |
+
+- **討論提案**　官網發行：網頁前端部署在 Cloudflare；Mac App 在 macOS 建置環境打包，完成簽章、公證後將安裝檔放到 R2，官網提供下載。App 在使用者的 Mac 執行，透過 API 連後端；Cloudflare 託管網站和安裝檔，不執行桌面 App。[G8]
+- **討論提案**　Mac 發布流程：固定原始碼版本 → 建置與 QA → 簽章／公證 → 驗證最終安裝檔 → 發布安裝檔與更新資訊。QA 與正式版若使用不同設定，固定同一個原始碼 commit，正式建置仍需驗證；不把「後端重用產物」直接套成 App 必須使用同一個二進位檔。[G8]
+- **討論提案**　App 與後端分開發布：後端先部署相容版本，再發布 App；分別記錄後端 commit 與 App 版本號、build number、原始碼 commit。後端維持新舊 App 相容，不能假設使用者立即更新；已安裝的 App 也不能像 Worker 一樣立即全面回滾。[G8]
+- **待確認**　官網版更新工具、簽章與公證的 CI 細節、安裝檔保存策略仍待設計。先前 Apple 官方查詢未成功，表格是設計取捨，商店付款、沙盒、審核與公證要求需在實作前核對最新官方文件；不以特定抽成比例或付款例外作為已查證的決策依據。[G8]
+
 ## 12. AI Feedback → Prompt Iteration
 
 ### 辨識的資料飛輪
@@ -585,6 +605,7 @@ User request
 | Cloudflare Workers Builds | 原提案：連接 GitHub，自動建置與部署 Workers | **已被取代**；目前推薦改由 GitHub Actions 統一編排部署，不同時啟用 Builds 自動部署 [G6][G7] |
 | GitHub Actions | CI、建置、QA 部署、人工核准及 Production 部署；呼叫 Wrangler | **討論提案**；目前推薦方案，取代原本僅做 CI 的分工，尚未正式採納 [G7] |
 | QA／Production 環境隔離 | 獨立 Worker、R2 Bucket、Secrets；驗收綁定 commit SHA | **討論提案**；先一套共用 QA，每個 PR 的獨立 Preview 日後再評估，尚未正式採納 [G6][G7] |
+| Mac 官網下載（DMG／R2） | 桌面安裝檔分發；另需簽章、公證與更新機制 | **討論提案**；第一版目前推薦，Mac App Store 延後評估 [G8] |
 | ADTOF／Demucs／自建模型 | 轉譜 | 備案、日後選項 |
 | NestJS、Python 推論服務、GCP Cloud Run、Vercel／Render | 後端 | 已被 Cloudflare 取代 |
 
@@ -626,6 +647,8 @@ User request
 34. beta 的 Mac App 怎麼發行？Claude 建議用公證過的 DMG 從自己的網站下載（第 11 節）。
 35. 「聽著選」怎麼做？Klangio 沒有查到信心分數，Claude 建議 beta 先用未量化和量化的時間差標示不確定的擊點（第 2 節）。
 
+36. **待確認**　第一版瀏覽器是否提供編輯與練習，還是維持只閱讀？Mac 官網下載方案的更新工具、簽章／公證 CI、安裝檔保存策略，以及日後進入 Mac App Store 的條件如何設定？見第 11 節。[G8]
+
 ## 16. 來源
 
 ### ChatGPT（`sources/chatgpt-summary-2026-10-04.md`）
@@ -638,6 +661,8 @@ User request
 - [G6] 2026-10-31 使用者在 ChatGPT 提供的 GitHub 更新內容：Cloudflare 部署分工（Terraform、Wrangler、Workers Builds、GitHub Actions、Preview Environment），明確要求記為目前推薦方案而非正式決策；另提出 ChatGPT 討論、Codex 修改 Repository 的協作建議。
 - [G7] 2026-10-31 接續討論 Local → QA → Production：GitHub Actions 統一編排、Wrangler 部署、QA 驗收後人工核准發布同一版本、環境隔離與回滾；使用者要求補進同一 PR。仍記為目前推薦方案，未將要求記錄等同正式採納。
 - （排除）即時語音使用方式：講的是 ChatGPT macOS 版怎麼操作，和產品需求無關。
+
+- [G8] 2026-10-31 第一版平台與 Mac 發行管道討論：使用者表示瀏覽器一定做，詢問官網下載與 Mac App Store 的優缺點；對「瀏覽器＋Mac 官網下載、商店延後評估」表示合理並要求寫入，整體保留為推薦方案，瀏覽器編輯範圍待確認。
 
 ### Claude（`sources/claude-summary-2026-10-04.md`，日期是各聊天最後更新日，UTC）
 
@@ -668,3 +693,4 @@ User request
 - 2026-10-22：用 grill 的方式逐輪討論 beta 需要的功能，加入使用者確認的決策：下一個里程碑是給真實使用者的 beta（上傳、轉譜、手動修正、存檔），AI 改譜放到之後；第一批客群是錄自己練習的鼓手和鼓老師；Klangio 實測先用免費方案；樂譜改存在本機 git（App 內建 isomorphic-git），GitHub 改成選用，兩邊都改過時不 push、由使用者選邊；訓練之後再做，使用者勾選同意後保留音訊、譜和 AI 對話改譜紀錄；書籤和練習模式（只做 Mac 版，書籤存在 `practice.json`，可以播原始錄音、鼓譜音符和節拍器，節拍器和游標跟譜上的 BPM，一個速度控制加三種聲音各自的開關和音量）；播放用 Swift 原生；鼓的音色用 Big Rusty Drums。標為已被取代：第 3 節「還沒界定 MVP 範圍」、16 週時程的「第二階段做語音編輯 MVP」、第 9 節「樂譜存在使用者自己的 GitHub repo」和「在 Mac App 裡串接 GitHub、一鍵 commit」、第 12 節「伺服器怎麼讀到使用者的 repo」。新增調研 `research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`，第 5 節加入 Klangio API 的查證結果，第 10 節補上 Klangio 價格。同步更新摘要、第 1、2、3、5、9、10、11、12 節、第 13 節 Decision Log、第 14 節技術棧總覽、來源 [C12]。第 15 節：第 1、2、5、15、21、24 項改寫；移除原第 32 項（Klangio 的未量化 MIDI 已和原始音訊對齊，不用自己做 onset 對齊）；新增第 32–35 項（錄音和譜的同步、beta 的轉譜費用、Mac App 的發行方式、「聽著選」的做法）。
 - 2026-10-31：第 11 節「開發流程」補充目前推薦的 Cloudflare 部署分工：Terraform 管理基礎設施、Wrangler 管理 Workers 設定與部署、Workers Builds 連接 GitHub 自動建置部署、GitHub Actions 只執行 CI 檢查以避免重複部署、Preview 隔離測試與正式環境的 R2；另列實作細節待確認，以及 ChatGPT 討論、Codex 修改 Repository 的協作建議。第 14 節同步新增或更新相關技術棧列，來源新增 [G6]。全部保留為討論提案或待確認，沒有新的明確決策，第 13 節 Decision Log 與第 15 節既有未決問題不變；沒有標為已被取代的項目。
 - 2026-10-31：補充第 11 節 Local → QA → Production 推薦流程與 Mermaid 圖：GitHub Actions 統一編排 CI 和部署、Wrangler 執行部署，QA 驗收與 Production 發布綁定同一 commit／程式產物；加入人工核准、健康檢查、Worker 回滾、環境隔離與共用 QA 的規則。原 Workers Builds 自動部署與 Actions 僅做 CI 的分工標為「已被取代」（提案調整）；第 14 節同步更新，來源新增 [G7]。實作驗證仍待確認，沒有新的明確決策，Decision Log 不變。
+- 2026-10-31：第 11 節新增第一版平台與 Mac 發行管道建議、優缺點比較、Cloudflare／R2 託管分工、官網版發布流程及新舊 App 相容原則；第 14 節新增 Mac 官網下載列，第 15 節追加第 36 項，來源新增 [G8]。建議維持討論提案，瀏覽器是否完整編輯仍待確認，既有網頁只閱讀決策與 Decision Log 不變。
