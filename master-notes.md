@@ -1,6 +1,6 @@
 # AI Music Project — Master Notes
 
-> 最後更新：2026-10-22
+> 最後更新：2026-11-03
 > 這是專案的唯一正文。原始整理保存在 `sources/`：ChatGPT 版 `chatgpt-summary-2026-10-04.md`、Claude 版 `claude-summary-2026-10-04.md`。
 > 狀態標記：**明確決策**＝使用者明確選定／**討論提案**＝提過但沒定案／**待確認**＝有傾向或前提但未拍板，或屬調研資訊需自行驗證／**已被取代**＝曾提出，但後來的決策讓它不再適用／**暫緩**＝使用者決定之後再處理。
 > 來源標記：[G#]＝ChatGPT 聊天，[C#]＝Claude 聊天（編號對照見文末「來源」）；[確認 10-04]＝使用者在 2026-10-04 合併兩份筆記時親自確認。
@@ -138,6 +138,7 @@
   - W6 資料飛輪、W7 從 trace 建資料集：使用者修正資料的回饋（第 12 節）
   - W7 eval 基礎、W8 LLM-as-Judge：100 句口語指令測試集與評分（第 7 節）
   可以和上面那份 16 週時程一起排。
+- **討論提案**　讀創業與商業的書，降低之後的試錯成本：Claude 推薦了 10 本書，以及書比較少涵蓋、但這個專案必備的知識（單位經濟、著作權、開源授權、個資和同意、供應商風險、使用者訪談），每一項都對應到這份筆記的章節或第 15 節的題號。放在 `study/business-books.md`。建議先讀 *The Mom Test*，再去訪談 beta 的鼓手和鼓老師。[C12]
 - **已被取代**　「先不做 Demucs」「先跑原始模型、不先微調」：這兩點是在自建模型的前提下討論的。改用 Klangio 之後，這些變成日後自建模型時才需要考慮的事。[C2]
 
 ## 4. Internal Music Model
@@ -611,7 +612,7 @@ User request
 - [C9] [鼓譜轉譜專案的下一步方向](https://claude.ai/chat/1a4645c5-bdd1-4710-8c9b-7bcd93d7a5c5)（2026-09-28）
 - [C10] [鼓谱编辑界面的 AI 改动可视化设计](https://claude.ai/chat/a7e492da-75b3-457a-ab73-310f8737e907)（2026-09-29）
 - [C11] [中英雙語電商客服 Agent 技術文件規劃](https://claude.ai/chat/4a84dd18-0beb-4773-bdc3-c565974f479b)（2026-10-03）：只間接提到 Jev 比較適合鼓譜專案的單句指令，沒有新增專案內容。
-- [C12] [Claude Code：架構、競品與學習資料討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06～10-22）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）、學習資料（`study/cs329z/`）、beta 範圍與練習模式的討論、Klangio 和 git／GitHub／鼓音色的調研（`research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`）。
+- [C12] [Claude Code：架構、競品與學習資料討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06～11-03）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）、學習資料（`study/cs329z/`）、beta 範圍與練習模式的討論、Klangio 和 git／GitHub／鼓音色的調研（`research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`）、創業與商業書單（`study/business-books.md`）。
 
 ## 更新紀錄
 
@@ -625,3 +626,4 @@ User request
 - 2026-10-11：第 3 節新增討論提案，指到 `study/cs329z/`（CS329Z 自學資料），列出和專案直接相關的單元；來源 [C12] 補上學習資料。沒有新的明確決策，第 13、14 節不變；未決問題不變。
 - 2026-10-22：加入使用者確認的決策：本地音檔配對用 SHA-256 比對，hash 對不上（例如轉過檔）只警告、不阻擋，並讓使用者手動選擇音檔。第 9 節「雲端只存 hash、用 hash 配對本地檔案」由待確認改為明確決策；「用音訊指紋取代 SHA-256」標為已被取代。第 11 節新增 Rust 評估的討論提案（Worker 和 TS 核心維持 TS，Rust 只留給日後 CPU 密集的純運算）。同步更新第 13 節 Decision Log、第 14 節 Cloudflare Workers 那列。第 15 節移除原第 13 項（音訊過期後靠 hash 配對本地檔案，已由本次決策解決），後面的編號往前移一號，原第 30 項裡的「第 20 項」改為「第 19 項」；新增第 32 項（onset 對齊）。
 - 2026-10-22：用 grill 的方式逐輪討論 beta 需要的功能，加入使用者確認的決策：下一個里程碑是給真實使用者的 beta（上傳、轉譜、手動修正、存檔），AI 改譜放到之後；第一批客群是錄自己練習的鼓手和鼓老師；Klangio 實測先用免費方案；樂譜改存在本機 git（App 內建 isomorphic-git），GitHub 改成選用，兩邊都改過時不 push、由使用者選邊；訓練之後再做，使用者勾選同意後保留音訊、譜和 AI 對話改譜紀錄；書籤和練習模式（只做 Mac 版，書籤存在 `practice.json`，可以播原始錄音、鼓譜音符和節拍器，節拍器和游標跟譜上的 BPM，一個速度控制加三種聲音各自的開關和音量）；播放用 Swift 原生；鼓的音色用 Big Rusty Drums。標為已被取代：第 3 節「還沒界定 MVP 範圍」、16 週時程的「第二階段做語音編輯 MVP」、第 9 節「樂譜存在使用者自己的 GitHub repo」和「在 Mac App 裡串接 GitHub、一鍵 commit」、第 12 節「伺服器怎麼讀到使用者的 repo」。新增調研 `research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`，第 5 節加入 Klangio API 的查證結果，第 10 節補上 Klangio 價格。同步更新摘要、第 1、2、3、5、9、10、11、12 節、第 13 節 Decision Log、第 14 節技術棧總覽、來源 [C12]。第 15 節：第 1、2、5、15、21、24 項改寫；移除原第 32 項（Klangio 的未量化 MIDI 已和原始音訊對齊，不用自己做 onset 對齊）；新增第 32–35 項（錄音和譜的同步、beta 的轉譜費用、Mac App 的發行方式、「聽著選」的做法）。
+- 2026-11-03：第 3 節新增討論提案，指到 `study/business-books.md`（10 本創業與商業書，以及專案必備的知識）；來源 [C12] 的日期延到 11-03，並補上書單。沒有新的明確決策，第 13、14 節不變；未決問題不變。
