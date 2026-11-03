@@ -1,0 +1,38 @@
+# 專案說明
+這個 repo 是 AI 鼓譜專案的筆記。master-notes.md 是唯一正文（SSOT），原始整理放在 sources/，調研放在 research/，spike 留下來值得沿用的程式碼放在 spike/。
+
+這份 `AGENTS.md` 是 Claude Code、Codex 等 AI 工具共用的唯一規則檔：Codex 直接讀它，Claude Code 透過 `CLAUDE.md` 裡的 `@AGENTS.md` 匯入。規則只改這裡，不要在 `CLAUDE.md` 或其他工具的設定裡另外寫一份。
+
+# 只認 main
+- 只有 GitHub 上 main 分支的檔案算數。未合併的 PR、本機檔案、聊天記憶都不算定案。
+- 開始之前先讀最新 main 上的 `AGENTS.md` 和 `master-notes.md`；在本機作業要先 `git pull`。
+- 討論時引用未合併 PR 的內容，要註明「還沒合併」。
+
+# 更新 master-notes.md 的規則
+1. 先完整讀過 master-notes.md，沿用既有的章節結構、用詞和標記，不要重寫或重排無關的段落。
+2. 每一條都要標狀態：明確決策／討論提案／待確認／已被取代／暫緩。只有使用者明確選定的才標「明確決策」，並加上 [確認 MM-DD]（用當天日期）。
+3. 舊內容被新決策推翻時不要刪除，改標「已被取代」，並註明被什麼取代。
+4. 有新的明確決策時，同步加進第 13 節 Decision Log，並更新第 14 節技術棧總覽的狀態。
+5. 第 15 節未決問題：已解決的移除，並在更新紀錄裡註明；新問題接在最後。
+6. 把頂部的「最後更新」改成當天，在文末「更新紀錄」加一條摘要。
+7. 遇到矛盾，或不確定該放哪一節，不要自己猜，在 PR 描述裡列出來詢問。
+
+# Git 規則
+- 從 main 開新 branch，命名為 notes/YYYY-MM-DD-簡短主題
+- commit 訊息用中文，簡述改了什麼
+- 開 PR 到 main，描述裡列出新增、修改、標為已被取代的項目，以及需要確認的地方
+- 如果和現有未合併的 PR 有衝突，在描述裡註明
+- 不要 merge，等使用者審過再合
+
+# 工作方式
+- 多步驟的修改先列計劃（要改哪些檔案、新增哪些），使用者說 go 才動手。單行修正或使用者說「直接做」的除外。
+- 未經同意不要安裝任何套件（npm、pip、cargo 等）。
+- 規格沒寫、自己決定的地方，做完要主動說明選了什麼、為什麼。
+- 之後若加入程式碼，改完要跑建置／型別檢查，零錯誤才算完成。
+
+# 在哪裡討論
+- 可以寫進 repo 的：Claude Code（雲端 session，也就是手機或網頁的 Code 分頁，或 Mac）和 Codex。兩邊都照上面的規則寫進 master-notes.md，再照 Git 規則開 PR。
+- 只能讀的：ChatGPT、claude.ai 和手機 App 的一般聊天。在那邊討論出結論時，請它整理成摘要，交給 Claude Code 或 Codex 寫進筆記。
+- ChatGPT 不會自動讀這份檔案。要在 ChatGPT 的專案指示裡寫明：每次先用 GitHub 連接器讀 ben0128/music-project-notes main 上的 `AGENTS.md` 和 `master-notes.md`。
+- 在 Mac 上開始前先 `git pull`。
+- 2026-10-04 提過的「手機 AI 只能新增的收件匣」（Cloudflare Worker 或 GitHub Issues）已被取代：Claude 改成在 Code 分頁直接開 PR [確認 10-18]；ChatGPT 改成把結論交給 Codex 寫入 [確認 11-03]。
