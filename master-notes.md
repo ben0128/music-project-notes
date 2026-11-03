@@ -1,6 +1,6 @@
 # AI Music Project — Master Notes
 
-> 最後更新：2026-10-31
+> 最後更新：2026-11-03
 > 這是專案的唯一正文。原始整理保存在 `sources/`：ChatGPT 版 `chatgpt-summary-2026-10-04.md`、Claude 版 `claude-summary-2026-10-04.md`。
 > 狀態標記：**明確決策**＝使用者明確選定／**討論提案**＝提過但沒定案／**待確認**＝有傾向或前提但未拍板，或屬調研資訊需自行驗證／**已被取代**＝曾提出，但後來的決策讓它不再適用／**暫緩**＝使用者決定之後再處理。
 > 來源標記：[G#]＝ChatGPT 聊天，[C#]＝Claude 聊天（編號對照見文末「來源」）；[C-2026-10-27]＝使用者在另一個 session 討論、2026-10-27 貼進來的結論；[確認 10-04]＝使用者在 2026-10-04 合併兩份筆記時親自確認。
@@ -154,6 +154,7 @@
   - W6 資料飛輪、W7 從 trace 建資料集：使用者修正資料的回饋（第 12 節）
   - W7 eval 基礎、W8 LLM-as-Judge：100 句口語指令測試集與評分（第 7 節）
   可以和上面那份 16 週時程一起排。
+- **討論提案**　讀創業與商業的書，降低之後的試錯成本：Claude 推薦了 10 本書，以及書比較少涵蓋、但這個專案必備的知識（單位經濟、著作權、開源授權、個資和同意、供應商風險、使用者訪談），每一項都對應到這份筆記的章節或第 15 節的題號。放在 `study/business-books.md`。建議先讀 *The Mom Test*，再去訪談 beta 的鼓手和鼓老師。[C12]
 - **已被取代**　「先不做 Demucs」「先跑原始模型、不先微調」：這兩點是在自建模型的前提下討論的。改用 Klangio 之後，這些變成日後自建模型時才需要考慮的事。[C2]
 
 ## 4. Internal Music Model
@@ -762,7 +763,7 @@ User request
 - [C9] [鼓譜轉譜專案的下一步方向](https://claude.ai/chat/1a4645c5-bdd1-4710-8c9b-7bcd93d7a5c5)（2026-09-28）
 - [C10] [鼓谱编辑界面的 AI 改动可视化设计](https://claude.ai/chat/a7e492da-75b3-457a-ab73-310f8737e907)（2026-09-29）
 - [C11] [中英雙語電商客服 Agent 技術文件規劃](https://claude.ai/chat/4a84dd18-0beb-4773-bdc3-c565974f479b)（2026-10-03）：只間接提到 Jev 比較適合鼓譜專案的單句指令，沒有新增專案內容。
-- [C12] [Claude Code：架構、競品與學習資料討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06～10-22）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）、學習資料（`study/cs329z/`）、beta 範圍與練習模式的討論、Klangio 和 git／GitHub／鼓音色的調研（`research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`）。
+- [C12] [Claude Code：架構、競品與學習資料討論](https://claude.ai/code/session_01R9qmzK8akcrdYasyQkSgpj)（2026-10-06～11-03）：競品調查（`research/competitors-2026-10.md`）、圖片轉譜評估（`research/image-to-score-omr-2026-10.md`）、學習資料（`study/cs329z/`）、beta 範圍與練習模式的討論、Klangio 和 git／GitHub／鼓音色的調研（`research/klangio-api-2026-10.md`、`research/beta-tech-2026-10.md`）、創業與商業書單（`study/business-books.md`）。
 - [C13] [Claude Code：beta 未決問題的 grill 討論](https://claude.ai/code/session_011Rg4XwCjBPvm6xMxX79q5q)（2026-10-22～10-27）：第 15 節原第 1、21、32–35 項的結論，錄音格式，登入和兌換碼，發行和收款；Apple 收款規定和 Sign in with Apple 限制的調研（`research/login-payments-2026-10.md`）。
 - [C-2026-10-27] 使用者在另一個 session 討論出的結論，2026-10-27 貼進 Code 分頁：半速／倍速切換、鼓軌分離的 A/B 測試、修正資料的記錄設計。
 
@@ -782,3 +783,4 @@ User request
 - 2026-10-31：第 11 節「開發流程」補充目前推薦的 Cloudflare 部署分工：Terraform 管理基礎設施、Wrangler 管理 Workers 設定與部署、Workers Builds 連接 GitHub 自動建置部署、GitHub Actions 只執行 CI 檢查以避免重複部署、Preview 隔離測試與正式環境的 R2；另列實作細節待確認，以及 ChatGPT 討論、Codex 修改 Repository 的協作建議。第 14 節同步新增或更新相關技術棧列，來源新增 [G6]。全部保留為討論提案或待確認，沒有新的明確決策，第 13 節 Decision Log 與第 15 節既有未決問題不變；沒有標為已被取代的項目。
 - 2026-10-31：補充第 11 節 Local → QA → Production 推薦流程與 Mermaid 圖：GitHub Actions 統一編排 CI 和部署、Wrangler 執行部署，QA 驗收與 Production 發布綁定同一 commit／程式產物；加入人工核准、健康檢查、Worker 回滾、環境隔離與共用 QA 的規則。原 Workers Builds 自動部署與 Actions 僅做 CI 的分工標為「已被取代」（提案調整）；第 14 節同步更新，來源新增 [G7]。實作驗證仍待確認，沒有新的明確決策，Decision Log 不變。
 - 2026-10-31：第 11 節新增第一版平台與 Mac 發行管道建議、優缺點比較、Cloudflare／R2 託管分工、官網版發布流程及新舊 App 相容原則；第 14 節新增 Mac 官網下載列，第 15 節追加第 36 項，來源新增 [G8]。建議維持討論提案，瀏覽器是否完整編輯仍待確認，既有網頁只閱讀決策與 Decision Log 不變。
+- 2026-11-03：第 3 節新增討論提案，指到 `study/business-books.md`（10 本創業與商業書，以及專案必備的知識）；來源 [C12] 的日期延到 11-03，並補上書單。沒有新的明確決策，第 13、14 節不變；未決問題不變。
